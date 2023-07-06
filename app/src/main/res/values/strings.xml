@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">FoodReminder</string>
+    <string name="app_name">Chill.in</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="user_info">user_info</string>
 </resources>

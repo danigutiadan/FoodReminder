@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_dashboard"
+    app:startDestination="@id/dashboard_navigation_home">
+
+    <fragment
+        android:id="@+id/dashboard_navigation_home"
+        android:name="com.danigutiadan.foodreminder.features.dashboard.home.ui.HomeFragment"
+        android:label="fragment_home" />
+    <fragment
+        android:id="@+id/dashboard_navigation_profile"
+        android:name="com.danigutiadan.foodreminder.features.dashboard.profile.ui.ProfileFragment"
+        android:label="fragment_profile" />
+
+
+</navigation>
