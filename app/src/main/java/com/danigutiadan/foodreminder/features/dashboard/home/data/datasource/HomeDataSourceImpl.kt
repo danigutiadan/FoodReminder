@@ -2,6 +2,8 @@ package com.danigutiadan.foodreminder.features.dashboard.home.data.datasource
 
 import android.util.Log
 import com.danigutiadan.foodreminder.Preferences
+import com.danigutiadan.foodreminder.database.FoodReminderDatabase
+import com.danigutiadan.foodreminder.features.food_detail.data.Food
 import com.danigutiadan.foodreminder.utils.Result
 import com.google.android.libraries.places.api.model.TypeFilter
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
@@ -15,7 +17,8 @@ import javax.inject.Inject
 class HomeDataSourceImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val preferences: Preferences,
-    private val placesClient: PlacesClient
+    private val placesClient: PlacesClient,
+    private val db: FoodReminderDatabase
 ) : HomeDataSource {
 
     override fun doLogout(): Flow<Result<Void>> = callbackFlow {
@@ -30,6 +33,10 @@ class HomeDataSourceImpl @Inject constructor(
             close()
         }
         awaitClose()
+    }
+
+    override fun getAllFood(): Flow<List<Food>> {
+        return db.foodHomeDao().getAllFood()
     }
 
     fun doSearchPlaces(input: String = "Restaurante tenerife") {

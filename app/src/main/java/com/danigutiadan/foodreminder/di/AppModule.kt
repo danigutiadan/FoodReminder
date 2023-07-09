@@ -2,6 +2,7 @@ package com.danigutiadan.foodreminder.di
 
 import android.app.Application
 import com.danigutiadan.foodreminder.Preferences
+import com.danigutiadan.foodreminder.database.FoodReminderDatabase
 import com.danigutiadan.foodreminder.features.dashboard.home.data.datasource.HomeDataSource
 import com.danigutiadan.foodreminder.features.dashboard.home.data.datasource.HomeDataSourceImpl
 import com.danigutiadan.foodreminder.features.dashboard.home.data.repository.HomeRepositoryImpl
@@ -63,78 +64,16 @@ object AppModule {
      @Provides
     fun  providePlacesClient(app: Application) = Places.createClient(app)
 
-    //REPOSITORIES-------------------------
-    @Singleton
-    @Provides
-    fun provideLoginRepository(authDataSource: AuthDataSource) : LoginRepository = LoginRepositoryImpl(authDataSource)
 
-    @Singleton
-    @Provides
-    fun provideRegisterRepository(authDataSource: AuthDataSource) : RegisterRepository = RegisterRepositoryImpl(authDataSource)
-
-    @Singleton
-    @Provides
-    fun provideAddUserInfoRepository(addUserInfoDataSource: AddUserInfoDataSource): AddUserInfoRepository = AddUserInfoRepositoryImpl(addUserInfoDataSource)
-
-    @Singleton
-    @Provides
-    fun provideUserRepository(userDataSource: UserDataSource): UserRepository = UserRepositoryImpl(userDataSource = userDataSource)
-
-    @Singleton
-    @Provides
-    fun provideHomeRepository(homeDataSource: HomeDataSource): HomeRepository = HomeRepositoryImpl(homeDataSource = homeDataSource)
-
-    @Singleton
-    @Provides
-    fun provideProfileRepository(homeDataSource: HomeDataSource): ProfileRepository = ProfileRepositoryImpl(homeDataSource = homeDataSource)
-
-    //USECASES------------------------------
-    @Singleton
-    @Provides
-    fun provideLoginUseCase(repository: LoginRepository) = EmailLoginUseCase(repository)
-
-    @Singleton
-    @Provides
-    fun provideEmailRegisterUseCase(repository: RegisterRepository) = EmailRegisterUseCase(repository)
-
-    @Singleton
-    @Provides
-    fun provideUploadUserImageUseCase(addUserInfoRepository: AddUserInfoRepository) = UploadUserImageUseCase(addUserInfoRepository)
-
-    @Singleton
-    @Provides
-    fun provideGetUserInfoUseCase(userRepository: UserRepository) = GetUserInfoUseCase(userRepository = userRepository)
-
-    @Singleton
-    @Provides
-    fun provideLogoutUseCase(profileRepository: ProfileRepository) = LogoutUseCase(profileRepository = profileRepository)
-
-
-    //DATASOURCES---------------------------
-    @Singleton
-    @Provides
-    fun provideAuthDataSource(auth: FirebaseAuth, db: FirebaseFirestore, preferences: Preferences) : AuthDataSource = AuthDataSourceImpl(auth, db, preferences)
-
-    @Singleton
-    @Provides
-    fun provideAddUserInfoDataSource(db: FirebaseFirestore, storage: FirebaseStorage, preferences: Preferences): AddUserInfoDataSource = AddUserInfoDataSourceImpl(db, storage, preferences)
-
-    @Singleton
-    @Provides
-    fun provideHomeDataSource(auth: FirebaseAuth, preferences: Preferences, placesClient: PlacesClient): HomeDataSource = HomeDataSourceImpl(auth = auth, preferences = preferences, placesClient = placesClient)
-
-    @Singleton
-    @Provides
-    fun provideProfileDataSource(auth: FirebaseAuth, preferences: Preferences): ProfileDataSource = ProfileDataSourceImpl(auth = auth, preferences = preferences)
-
-    @Singleton
-    @Provides
-    fun provideUserDataSource(db: FirebaseFirestore): UserDataSource = UserDataSourceImpl(db = db)
 
     //PREFERENCES---------------------------
     @Singleton
     @Provides
     fun providePreferences(app: Application) = Preferences(app)
+
+    @Singleton
+    @Provides
+    fun provideDatabase(app: Application) = FoodReminderDatabase.getInstance(app)
 
 
 }

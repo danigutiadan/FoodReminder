@@ -46,7 +46,7 @@ import com.danigutiadan.foodreminder.features.dashboard.home.ui.components.Activ
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(buttonListener: () -> Unit) {
     val beaches = listOf(
         "Playa de las Canteras",
         "Playa de Maspalomas",
@@ -78,7 +78,7 @@ fun HomeScreen() {
             )
 
             Spacer(modifier = Modifier.weight(1F))
-            Button(onClick = {}) {
+            Button(onClick = {buttonListener()}) {
                 Text(text = "+")
             }
         }
@@ -209,5 +209,5 @@ fun ButtonsBar() {
 @Preview(showBackground = true)
 @Composable
 fun PreviewHomeScreen() {
-    HomeScreen()
+    HomeScreen({})
 }

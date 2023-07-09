@@ -1,11 +1,13 @@
 package com.danigutiadan.foodreminder.features.dashboard.home.data.datasource
 
+import androidx.room.Dao
+import androidx.room.Query
 import com.danigutiadan.foodreminder.features.food_detail.data.Food
-import com.danigutiadan.foodreminder.utils.Result
 import kotlinx.coroutines.flow.Flow
 
-interface HomeDataSource {
+@Dao
+interface FoodHomeDao {
 
-    fun doLogout(): Flow<Result<Void>>
+    @Query("SELECT * FROM food")
     fun getAllFood(): Flow<List<Food>>
 }

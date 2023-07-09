@@ -120,6 +120,14 @@ dependencies {
 
     //Places
     implementation 'com.google.android.libraries.places:places:3.1.0'
+    implementation("androidx.room:room-runtime:2.5.2")
+    annotationProcessor("androidx.room:room-compiler:2.5.2")
+
+    // To use Kotlin annotation processing tool (kapt)
+    kapt("androidx.room:room-compiler:2.5.2")
+
+    // optional - Kotlin Extensions and Coroutines support for Room
+    implementation("androidx.room:room-ktx:2.5.2")
 
 
 
@@ -131,6 +139,8 @@ dependencies {
         // When using the BoM, you don't specify versions in Firebase library dependencies
         implementation 'com.google.firebase:firebase-firestore-ktx'
     }
+
+    apply plugin: 'com.google.gms.google-services'
 
 }
 
