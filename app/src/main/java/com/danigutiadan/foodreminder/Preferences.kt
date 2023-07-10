@@ -16,6 +16,14 @@ class Preferences @Inject constructor(private val context: Context) {
         get() = Gson().fromJson(sharedPreferences.getString(context.getString(R.string.user_info), null), UserInfo::class.java)
         set(value) = sharedPreferences.edit { putString(context.getString(R.string.user_info), Gson().toJson(value)) }
 
+    var isDatabaseInitialized: Boolean?
+        get() = sharedPreferences.getBoolean(context.getString(R.string.is_database_initialized), false)
+        set(value) = sharedPreferences.edit { value?.let {
+            putBoolean(context.getString(R.string.is_database_initialized),
+                it
+            )
+        } }
+
 //    var additionalUserInfo: AdditionalUserInfo?
 //        get() = Gson().fromJson(sharedPreferences.getString(context.getString(R.string.additional_user_info), null), AdditionalUserInfo::class.java)
 //        set(value) = sharedPreferences.edit { putString(context.getString(R.string.additional_user_info), Gson().toJson(value)) }

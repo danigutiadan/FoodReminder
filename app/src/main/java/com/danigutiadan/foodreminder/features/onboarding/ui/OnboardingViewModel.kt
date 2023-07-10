@@ -8,7 +8,7 @@ import com.danigutiadan.foodreminder.features.onboarding.data.UserInfo
 import com.danigutiadan.foodreminder.features.onboarding.signin.domain.usecases.EmailLoginUseCase
 import com.danigutiadan.foodreminder.features.onboarding.signin.domain.usecases.GetUserInfoUseCase
 import com.danigutiadan.foodreminder.features.onboarding.signup.domain.usecases.EmailRegisterUseCase
-import com.danigutiadan.foodreminder.utils.Result
+import com.danigutiadan.foodreminder.utils.Response
 import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -23,11 +23,11 @@ class OnboardingViewModel @Inject constructor(
 ) :
     ViewModel() {
 
-    private val _emailSignInState = MutableStateFlow<Result<FirebaseUser>>(Result.Loading)
-    val emailSignInState: StateFlow<Result<FirebaseUser>> = _emailSignInState
+    private val _emailSignInState = MutableStateFlow<Response<FirebaseUser>>(Response.Loading)
+    val emailSignInState: StateFlow<Response<FirebaseUser>> = _emailSignInState
 
-    private val _emailRegisterState = MutableStateFlow<Result<FirebaseUser>>(Result.Loading)
-    val emailRegisterState: StateFlow<Result<FirebaseUser>> = _emailRegisterState
+    private val _emailRegisterState = MutableStateFlow<Response<FirebaseUser>>(Response.Loading)
+    val emailRegisterState: StateFlow<Response<FirebaseUser>> = _emailRegisterState
 
     private val _email = MutableStateFlow("")
     val email: StateFlow<String> = _email
@@ -46,10 +46,10 @@ class OnboardingViewModel @Inject constructor(
 
     fun signInWithEmail() {
         emailLoginUseCase.execute(_email.value, _password.value)
-            .onStart { _emailSignInState.value = Result.Loading }
+            .onStart { _emailSignInState.value = Response.Loading }
             .onEach { result ->
                 _emailSignInState.value = result
-                if (result is Result.Success) {
+                if (result is Response.Success) {
                     getUserInfo(userId = result.data.uid)
                 }
             }
@@ -58,16 +58,16 @@ class OnboardingViewModel @Inject constructor(
 
     fun registerWithEmail() {
         emailRegisterUseCase.execute(_email.value, _password.value)
-            .onStart { _emailRegisterState.value = Result.Loading }
+            .onStart { _emailRegisterState.value = Response.Loading }
             .onEach { _emailRegisterState.value = it }
             .launchIn(viewModelScope)
     }
 
     private fun getUserInfo(userId: String) {
         getUserInfoUseCase.execute(userId)
-            .onStart { _emailSignInState.value = Result.Loading }
+            .onStart { _emailSignInState.value = Response.Loading }
             .onEach { result ->
-                if (result is Result.Success) {
+                if (result is Response.Success) {
                     result.data.let {
                         preferences.user = UserInfo(
                             id = it.id,

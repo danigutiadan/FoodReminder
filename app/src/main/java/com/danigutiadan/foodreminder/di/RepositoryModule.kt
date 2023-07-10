@@ -4,6 +4,9 @@ import com.danigutiadan.foodreminder.features.dashboard.home.data.repository.Hom
 import com.danigutiadan.foodreminder.features.dashboard.home.domain.repository.HomeRepository
 import com.danigutiadan.foodreminder.features.dashboard.profile.data.repository.ProfileRepositoryImpl
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.repository.ProfileRepository
+import com.danigutiadan.foodreminder.features.food_type.data.datasource.FoodTypeDataSource
+import com.danigutiadan.foodreminder.features.food_type.data.repository.FoodTypeRepositoryImpl
+import com.danigutiadan.foodreminder.features.food_type.domain.repository.FoodTypeRepository
 import com.danigutiadan.foodreminder.features.onboarding.adduserinfo.data.datasource.AddUserInfoDataSource
 import com.danigutiadan.foodreminder.features.onboarding.adduserinfo.data.repository.AddUserInfoRepositoryImpl
 import com.danigutiadan.foodreminder.features.onboarding.adduserinfo.domain.repository.AddUserInfoRepository
@@ -50,4 +53,7 @@ object RepositoryModule {
     @Provides
     fun provideProfileRepository(homeDataSource: HomeDataSource): ProfileRepository = ProfileRepositoryImpl(homeDataSource = homeDataSource)
 
+    @Singleton
+    @Provides
+    fun provideFoodTypeRepository(foodTypeDataSource: FoodTypeDataSource): FoodTypeRepository = FoodTypeRepositoryImpl(foodTypeDataSource)
 }

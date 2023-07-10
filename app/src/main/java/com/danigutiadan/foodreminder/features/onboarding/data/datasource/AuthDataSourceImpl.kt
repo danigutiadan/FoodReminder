@@ -5,7 +5,7 @@ import com.danigutiadan.foodreminder.features.onboarding.data.UserInfo
 import com.danigutiadan.foodreminder.firestore.Collections
 import com.danigutiadan.foodreminder.firestore.UserFields
 import com.danigutiadan.foodreminder.firestore.newFirebaseUser
-import com.danigutiadan.foodreminder.utils.Result
+import com.danigutiadan.foodreminder.utils.Response
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -34,11 +34,11 @@ class AuthDataSourceImpl @Inject constructor(
                     lastName = "",
                     email = it.user?.email
                 )
-                trySend(Result.Success(it.user!!))
+                trySend(Response.Success(it.user!!))
                 close()
             }
             .addOnFailureListener {
-                trySend(Result.Error(it))
+                trySend(Response.Error(it))
                 close()
             }
 
@@ -50,26 +50,26 @@ class AuthDataSourceImpl @Inject constructor(
     }
 
 
-    override fun doEmailRegister(email: String, password: String): Result<FirebaseUser> {
-        var registerState: Result<FirebaseUser> = Result.Loading
+    override fun doEmailRegister(email: String, password: String): Response<FirebaseUser> {
+        var registerState: Response<FirebaseUser> = Response.Loading
         auth.createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener {
                 addUserToDatabase(email, it)
-                registerState = Result.Success(it.user!!)
+                registerState = Response.Success(it.user!!)
             }
-            .addOnFailureListener { registerState = Result.Error(it) }
+            .addOnFailureListener { registerState = Response.Error(it) }
 
         return registerState
     }
 
-    override fun addUserToDatabase(email: String, userData: AuthResult): Result<Void> {
-        var addUserToDatabaseState : Result<Void> = Result.Loading
+    override fun addUserToDatabase(email: String, userData: AuthResult): Response<Void> {
+        var addUserToDatabaseState : Response<Void> = Response.Loading
         db.collection(Collections.USERS).document(userData.user?.uid.toString()).set(
             newFirebaseUser(userData)
         ).addOnSuccessListener {
-            addUserToDatabaseState = Result.EmptySuccess
+            addUserToDatabaseState = Response.EmptySuccess
         }.addOnFailureListener {
-            addUserToDatabaseState = Result.Error(it)
+            addUserToDatabaseState = Response.Error(it)
         }
         return addUserToDatabaseState
     }
@@ -81,8 +81,8 @@ class AuthDataSourceImpl @Inject constructor(
         isRegisterCompleted: Boolean,
         termsChecked: Boolean,
         email: String
-    ): Flow<Result<Void>>  = callbackFlow{
-        var addUserInfoState : Result<Void> = Result.Loading
+    ): Flow<Response<Void>>  = callbackFlow{
+        var addUserInfoState : Response<Void> = Response.Loading
         preferences.user?.id?.let { userId ->
             db.collection(Collections.USERS).document(userId).set(
                 hashMapOf(
@@ -94,10 +94,10 @@ class AuthDataSourceImpl @Inject constructor(
                     UserFields.IS_REGISTER_COMPLETED to isRegisterCompleted,
                     UserFields.TERMS_CHECKED to termsChecked)
             ).addOnSuccessListener {
-                trySend(Result.EmptySuccess)
+                trySend(Response.EmptySuccess)
                 close()
             }.addOnFailureListener {
-                trySend(Result.Error(it))
+                trySend(Response.Error(it))
                 close()
             }
         }

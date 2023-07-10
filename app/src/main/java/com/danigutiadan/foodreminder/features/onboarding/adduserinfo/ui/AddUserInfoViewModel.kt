@@ -10,7 +10,7 @@ import com.danigutiadan.foodreminder.features.onboarding.adduserinfo.domain.usec
 import com.danigutiadan.foodreminder.features.onboarding.adduserinfo.domain.usecases.UploadUserImageUseCase
 import com.danigutiadan.foodreminder.features.onboarding.data.UserInfo
 import com.danigutiadan.foodreminder.features.onboarding.signin.domain.usecases.GetUserInfoUseCase
-import com.danigutiadan.foodreminder.utils.Result
+import com.danigutiadan.foodreminder.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import java.util.*
@@ -43,8 +43,8 @@ class AddUserInfoViewModel @Inject constructor(
     private val _addUserInfoTermsChecked = MutableStateFlow(false)
     val addUserInfoTermsChecked: StateFlow<Boolean> = _addUserInfoTermsChecked
 
-    private val _addUserInfoState = MutableStateFlow<Result<UserInfo>>(Result.Loading)
-    val addUserInfoState: StateFlow<Result<UserInfo>> = _addUserInfoState
+    private val _addUserInfoState = MutableStateFlow<Response<UserInfo>>(Response.Loading)
+    val addUserInfoState: StateFlow<Response<UserInfo>> = _addUserInfoState
 
     fun addUserInfo() {
         addUserInfoUseCase.execute(
@@ -54,9 +54,9 @@ class AddUserInfoViewModel @Inject constructor(
             true,
             _addUserInfoTermsChecked.value,
             preferences.user?.email ?: ""
-        ).onStart { _addUserInfoState.value = Result.Loading }
+        ).onStart { _addUserInfoState.value = Response.Loading }
             .onEach {
-                if(it is Result.EmptySuccess)
+                if(it is Response.EmptySuccess)
                 preferences.user?.id?.let { id -> getUserInfo(id) }
             }
             .launchIn(viewModelScope)
@@ -69,9 +69,9 @@ class AddUserInfoViewModel @Inject constructor(
 
     private fun getUserInfo(userId: String) {
         getUserInfoUseCase.execute(userId)
-            .onStart { _addUserInfoState.value = Result.Loading }
+            .onStart { _addUserInfoState.value = Response.Loading }
             .onEach { result ->
-                if (result is Result.Success) {
+                if (result is Response.Success) {
                     result.data.let {
                         preferences.user = UserInfo(
                             id = it.id,

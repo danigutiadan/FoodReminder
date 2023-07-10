@@ -4,7 +4,7 @@ import android.util.Log
 import com.danigutiadan.foodreminder.Preferences
 import com.danigutiadan.foodreminder.database.FoodReminderDatabase
 import com.danigutiadan.foodreminder.features.food_detail.data.Food
-import com.danigutiadan.foodreminder.utils.Result
+import com.danigutiadan.foodreminder.utils.Response
 import com.google.android.libraries.places.api.model.TypeFilter
 import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -21,15 +21,15 @@ class HomeDataSourceImpl @Inject constructor(
     private val db: FoodReminderDatabase
 ) : HomeDataSource {
 
-    override fun doLogout(): Flow<Result<Void>> = callbackFlow {
-        var logoutState: Result<Void> = Result.Loading
+    override fun doLogout(): Flow<Response<Void>> = callbackFlow {
+        var logoutState: Response<Void> = Response.Loading
         try {
             auth.signOut()
             preferences.user = null
-           trySend(Result.EmptySuccess)
+           trySend(Response.EmptySuccess)
             close()
         } catch (e: Exception) {
-            trySend(Result.Error(e))
+            trySend(Response.Error(e))
             close()
         }
         awaitClose()

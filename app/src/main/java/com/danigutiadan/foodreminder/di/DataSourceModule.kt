@@ -6,6 +6,8 @@ import com.danigutiadan.foodreminder.features.dashboard.home.data.datasource.Hom
 import com.danigutiadan.foodreminder.features.dashboard.home.data.datasource.HomeDataSourceImpl
 import com.danigutiadan.foodreminder.features.dashboard.profile.data.datasource.ProfileDataSource
 import com.danigutiadan.foodreminder.features.dashboard.profile.data.datasource.ProfileDataSourceImpl
+import com.danigutiadan.foodreminder.features.food_type.data.datasource.FoodTypeDataSource
+import com.danigutiadan.foodreminder.features.food_type.data.datasource.FoodTypeDataSourceImpl
 import com.danigutiadan.foodreminder.features.onboarding.adduserinfo.data.datasource.AddUserInfoDataSource
 import com.danigutiadan.foodreminder.features.onboarding.adduserinfo.data.datasource.AddUserInfoDataSourceImpl
 import com.danigutiadan.foodreminder.features.onboarding.data.datasource.AuthDataSource
@@ -46,4 +48,8 @@ object DataSourceModule {
     @Singleton
     @Provides
     fun provideUserDataSource(db: FirebaseFirestore): UserDataSource = UserDataSourceImpl(db = db)
+
+    @Singleton
+    @Provides
+    fun provideFoodTypeDataSource(db: FoodReminderDatabase): FoodTypeDataSource = FoodTypeDataSourceImpl(db)
 }

@@ -1,7 +1,7 @@
 package com.danigutiadan.foodreminder.features.dashboard.profile.data.datasource
 
 import com.danigutiadan.foodreminder.Preferences
-import com.danigutiadan.foodreminder.utils.Result
+import com.danigutiadan.foodreminder.utils.Response
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -13,14 +13,14 @@ class ProfileDataSourceImpl @Inject constructor(
     private val preferences: Preferences
 ) : ProfileDataSource {
 
-    override fun doLogout(): Flow<Result<Void>> = callbackFlow{
+    override fun doLogout(): Flow<Response<Void>> = callbackFlow{
         try {
             auth.signOut()
             preferences.user = null
-            trySend(Result.EmptySuccess)
+            trySend(Response.EmptySuccess)
             close()
         } catch (e: Exception) {
-            trySend(Result.Error(e))
+            trySend(Response.Error(e))
             close()
         }
             awaitClose()

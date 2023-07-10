@@ -35,7 +35,7 @@ import com.danigutiadan.foodreminder.features.onboarding.signin.ui.screens.SignI
 import com.danigutiadan.foodreminder.features.onboarding.signup.ui.screens.SignUpScreen
 import com.danigutiadan.foodreminder.ui.theme.FoodReminderTheme
 import com.danigutiadan.foodreminder.utils.ImageUtils
-import com.danigutiadan.foodreminder.utils.Result
+import com.danigutiadan.foodreminder.utils.Response
 import com.dokar.sheets.BottomSheetState
 import com.dokar.sheets.BottomSheetValue
 import com.google.firebase.auth.FirebaseUser
@@ -148,10 +148,10 @@ class OnboardingActivity : BaseActivity() {
         }
     }
 
-    private fun controlEmailLoginState(result: Result<FirebaseUser>) {
-        when (result) {
-            is Result.Success -> {
-                Log.d("Datos:", result.data.toString())
+    private fun controlEmailLoginState(response: Response<FirebaseUser>) {
+        when (response) {
+            is Response.Success -> {
+                Log.d("Datos:", response.data.toString())
                 //navigateToSignUp(navController!!)
                 manageLoginSuccess()
             }
@@ -176,10 +176,10 @@ class OnboardingActivity : BaseActivity() {
         startActivity(intent)
     }
 
-    private fun controlEmailRegisterState(result: Result<FirebaseUser>) {
-        when (result) {
-            is Result.Success -> {
-                Log.d("Datos:", result.data.toString())
+    private fun controlEmailRegisterState(response: Response<FirebaseUser>) {
+        when (response) {
+            is Response.Success -> {
+                Log.d("Datos:", response.data.toString())
                 //navigateToSignIn(navController!!)
                 navController!!.navigate(route = SIGN_IN, navOptions = NavOptions.Builder().apply {
                     setPopUpTo(SIGN_IN, true)
@@ -201,16 +201,16 @@ class OnboardingActivity : BaseActivity() {
         }
     }
 
-    private fun controlAddUserInfo(state: Result<UserInfo>) {
+    private fun controlAddUserInfo(state: Response<UserInfo>) {
         when (state) {
-            is Result.Success -> {
+            is Response.Success -> {
                 navigateToDashboard(true)
             }
 
-            is Result.Loading -> {}
+            is Response.Loading -> {}
 
-            is Result.EmptySuccess -> TODO()
-            is Result.Error -> TODO()
+            is Response.EmptySuccess -> TODO()
+            is Response.Error -> TODO()
         }
     }
 
@@ -223,7 +223,7 @@ class OnboardingActivity : BaseActivity() {
         val email: String by viewModel.email.collectAsState()
         val password: String by viewModel.password.collectAsState()
         val isButtonEnabled: Boolean by viewModel.buttonEnabled.collectAsState()
-        val signInState: Result<FirebaseUser> by viewModel.emailSignInState.collectAsState()
+        val signInState: Response<FirebaseUser> by viewModel.emailSignInState.collectAsState()
 
         SignInScreen(
             email = email,

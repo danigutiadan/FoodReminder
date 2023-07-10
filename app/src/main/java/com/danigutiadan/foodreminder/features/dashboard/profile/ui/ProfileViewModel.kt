@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.danigutiadan.foodreminder.Preferences
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.usecases.LogoutUseCase
-import com.danigutiadan.foodreminder.utils.Result
+import com.danigutiadan.foodreminder.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
@@ -15,12 +15,12 @@ class ProfileViewModel @Inject constructor(
     val preferences: Preferences
 ) : ViewModel() {
 
-    private val _logoutState = MutableStateFlow<Result<Void>>(Result.Loading)
-    val logoutState: StateFlow<Result<Void>> = _logoutState
+    private val _logoutState = MutableStateFlow<Response<Void>>(Response.Loading)
+    val logoutState: StateFlow<Response<Void>> = _logoutState
 
     fun logout() {
         logoutUseCase.execute()
-            .onStart { _logoutState.value = Result.Loading }
+            .onStart { _logoutState.value = Response.Loading }
             .onEach { _logoutState.value = it }
             .launchIn(viewModelScope)
     }

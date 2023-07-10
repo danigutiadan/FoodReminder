@@ -19,7 +19,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.danigutiadan.foodreminder.features.onboarding.ui.OnboardingViewModel
 import com.google.firebase.auth.FirebaseUser
-import com.danigutiadan.foodreminder.utils.Result
+import com.danigutiadan.foodreminder.utils.Response
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
 
@@ -174,8 +174,8 @@ fun LoginTextError(message: String) {
 }
 
 @Composable
-fun LoginError(response: Result<FirebaseUser>) {
-    when ((response as Result.Error).exception) {
+fun LoginError(response: Response<FirebaseUser>) {
+    when ((response as Response.Error).exception) {
         is FirebaseAuthInvalidUserException -> {
             LoginTextError(message = "El usuario no existe")
         }

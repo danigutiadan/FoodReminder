@@ -1,7 +1,7 @@
 package com.danigutiadan.foodreminder.features.onboarding.adduserinfo.domain.usecases
 
 import com.danigutiadan.foodreminder.features.onboarding.signin.domain.repository.LoginRepository
-import com.danigutiadan.foodreminder.utils.Result
+import com.danigutiadan.foodreminder.utils.Response
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 import javax.inject.Inject
@@ -15,7 +15,7 @@ class AddUserInfoUseCase @Inject constructor(private val loginRepository: LoginR
         isRegisterCompleted: Boolean,
         termsChecked: Boolean,
         email: String
-    ): Flow<Result<Void>> {
+    ): Flow<Response<Void>> {
         return loginRepository.addUserInfo(
             name,
             lastName,

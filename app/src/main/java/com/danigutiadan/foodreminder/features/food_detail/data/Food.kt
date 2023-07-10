@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.danigutiadan.foodreminder.features.food_detail.FoodType
+import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
 
 @Entity(tableName = "food", foreignKeys = [ForeignKey(entity = FoodType::class, parentColumns = ["id"], childColumns = ["foodTypeId"])])
 data class Food(

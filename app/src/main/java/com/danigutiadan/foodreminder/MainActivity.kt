@@ -3,6 +3,7 @@ package com.danigutiadan.foodreminder
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,6 +16,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.danigutiadan.foodreminder.features.dashboard.DashboardActivity
+import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
+import com.danigutiadan.foodreminder.features.food_type.ui.FoodTypeViewModel
 import com.danigutiadan.foodreminder.features.onboarding.ui.OnboardingActivity
 import com.google.android.libraries.places.api.Places
 import dagger.hilt.android.AndroidEntryPoint
@@ -23,10 +26,22 @@ import kotlin.concurrent.thread
 
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
+    private val foodTypeViewModel: FoodTypeViewModel by viewModels()
+    private val foodTypes = listOf("Frutas", "Verduras", "Carnes", "Lácteos", "Cereales", "Legumbres")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        if(preferences.isDatabaseInitialized == false)
+        foodTypes.forEach { foodType ->
+            foodTypeViewModel.insertFoodType(FoodType(name = foodType))
+            preferences.isDatabaseInitialized = true
+        }
+
+        foodTypeViewModel.getAllFoodTypes()
+
+
         Places.initialize(this, "AIzaSyCVVw3jI_eaOdBNx1bN8YffqdGualTGKYI", Locale("es_ES"))
+
 
         setContent {
             SplashScreen()

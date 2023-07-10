@@ -4,6 +4,9 @@ import com.danigutiadan.foodreminder.features.dashboard.home.domain.repository.H
 import com.danigutiadan.foodreminder.features.dashboard.home.domain.usecases.GetAllFoodUseCase
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.repository.ProfileRepository
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.usecases.LogoutUseCase
+import com.danigutiadan.foodreminder.features.food_type.domain.repository.FoodTypeRepository
+import com.danigutiadan.foodreminder.features.food_type.domain.usecases.GetAllFoodTypesUseCase
+import com.danigutiadan.foodreminder.features.food_type.domain.usecases.InsertFoodTypeUseCase
 import com.danigutiadan.foodreminder.features.onboarding.adduserinfo.domain.repository.AddUserInfoRepository
 import com.danigutiadan.foodreminder.features.onboarding.adduserinfo.domain.usecases.UploadUserImageUseCase
 import com.danigutiadan.foodreminder.features.onboarding.signin.domain.repository.LoginRepository
@@ -46,4 +49,12 @@ object UseCaseModule {
     @Singleton
     @Provides
     fun provideGetAllFoodUseCase(homeRepository: HomeRepository) = GetAllFoodUseCase(homeRepository = homeRepository)
+
+    @Singleton
+    @Provides
+    fun provideInsertFoodTypeUseCase(foodTypeRepository: FoodTypeRepository) = InsertFoodTypeUseCase(foodTypeRepository = foodTypeRepository)
+
+    @Singleton
+    @Provides
+    fun provideGetAllFoodTypesUseCase(foodTypeRepository: FoodTypeRepository) = GetAllFoodTypesUseCase(foodTypeRepository = foodTypeRepository)
 }

@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.danigutiadan.foodreminder.R
 import com.danigutiadan.foodreminder.features.onboarding.signin.ui.*
-import com.danigutiadan.foodreminder.utils.Result
+import com.danigutiadan.foodreminder.utils.Response
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseUser
 
@@ -25,7 +25,7 @@ fun SignInScreen(
     email: String,
     password: String,
     isButtonEnabled: Boolean,
-    signInState: Result<FirebaseUser>,
+    signInState: Response<FirebaseUser>,
     onLoginChanged: (String, String) -> Unit,
     resetValues: () -> Unit,
     goToSignUp: () -> Unit, goToAddUserInfo: () -> Unit,
@@ -60,7 +60,7 @@ fun SignInContent(
     email: String,
     password: String,
     isButtonEnabled: Boolean,
-    signInState: Result<FirebaseUser>,
+    signInState: Response<FirebaseUser>,
     onLoginChanged: (String, String) -> Unit,
     resetValues: () -> Unit,
     goToSignUp: (() -> Unit),
@@ -92,7 +92,7 @@ fun SignInContent(
             SecondPasswordTextField(password, "Password") {
                onLoginChanged(email, it)
             }
-            if (signInState is Result.Error)
+            if (signInState is Response.Error)
                 LoginError(response = signInState)
             LoginButton(isButtonEnabled, "Iniciar sesion") { signInWithEmail() }
             RegisterText {
@@ -116,7 +116,7 @@ fun PreviewSignIn() {
         email = "",
         password = "",
         isButtonEnabled = false,
-        signInState = Result.Error(FirebaseAuthInvalidCredentialsException("text", "holas")),
+        signInState = Response.Error(FirebaseAuthInvalidCredentialsException("text", "holas")),
         onLoginChanged = {_, _ ->},
         resetValues = {},
         goToSignUp = {},
