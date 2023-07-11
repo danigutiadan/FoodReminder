@@ -2,6 +2,6 @@
 <resources>
 
     <style name="Theme.FoodReminder" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:statusBarColor">@color/purple_700</item>
+        <item name="android:statusBarColor">#638A35</item>
     </style>
 </resources>

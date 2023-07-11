@@ -116,10 +116,16 @@ fun HomeScreen(buttonListener: () -> Unit) {
 @Composable
 fun HomeSearchBar() {
     var input: String by remember { mutableStateOf("") }
+    CustomTextField(input = input, "Hola",  onValueChanged = { newText -> input = newText})
+
+}
+
+@Composable
+fun CustomTextField(input: String, placeHolder: String, modifier: Modifier = Modifier.fillMaxWidth(), onValueChanged: (String) -> Unit) {
     BasicTextField(
         value = input,
         onValueChange = { newText ->
-            input = newText
+            onValueChanged(newText)
         },
         textStyle = TextStyle(
             fontSize = 18.sp,
@@ -127,20 +133,19 @@ fun HomeSearchBar() {
         ),
         decorationBox = { innerTextField ->
             Box(
-                modifier = Modifier // margin left and right
-                    .fillMaxWidth()
-//                    .border(
-//                        width = 2.dp,
-//                        color = Color(0xFFAAE9E6),
-//                        shape = RoundedCornerShape(size = 16.dp)
-//                    )
+                modifier = modifier // margin left and right
+                    .border(
+                        width = 2.dp,
+                        color = Color(0xFFAAE9E6),
+                        shape = RoundedCornerShape(size = 16.dp)
+                    )
                     .clip(RoundedCornerShape(16.dp))
                     .background(Color.White)
                     .padding(horizontal = 16.dp, vertical = 12.dp), // inner padding
             ) {
                 if (input.isEmpty()) {
                     Text(
-                        text = "placeholder",
+                        text = placeHolder,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Normal,
                         color = Color.Gray
@@ -150,7 +155,6 @@ fun HomeSearchBar() {
             }
         }
     )
-
 }
 
 @Composable

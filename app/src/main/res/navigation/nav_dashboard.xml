@@ -7,11 +7,23 @@
     <fragment
         android:id="@+id/dashboard_navigation_home"
         android:name="com.danigutiadan.foodreminder.features.dashboard.home.ui.HomeFragment"
-        android:label="fragment_home" />
+        android:label="fragment_home" >
+        <action
+            android:id="@+id/action_dashboard_navigation_home_to_addFoodFragment"
+            app:destination="@id/addFoodFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
     <fragment
         android:id="@+id/dashboard_navigation_profile"
         android:name="com.danigutiadan.foodreminder.features.dashboard.profile.ui.ProfileFragment"
         android:label="fragment_profile" />
+    <fragment
+        android:id="@+id/addFoodFragment"
+        android:name="com.danigutiadan.foodreminder.features.add_food.ui.AddFoodFragment"
+        android:label="AddFoodFragment" />
 
 
 </navigation>

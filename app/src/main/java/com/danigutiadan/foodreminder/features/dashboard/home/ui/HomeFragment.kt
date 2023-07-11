@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.findNavController
 import com.danigutiadan.foodreminder.features.dashboard.home.ui.screens.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,7 +22,9 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         return ComposeView(requireContext()).apply {
             setContent {
-                HomeScreen(buttonListener = {homeViewModel.getAllFood()})
+                HomeScreen(buttonListener = {
+                    findNavController().navigate(HomeFragmentDirections.actionDashboardNavigationHomeToAddFoodFragment())
+                })
             }
         }
     }

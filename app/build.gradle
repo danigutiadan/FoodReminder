@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id("com.google.dagger.hilt.android")
+    id 'androidx.navigation.safeargs'// add here.
 }
 
 android {
@@ -22,6 +23,10 @@ android {
         }
     }
 
+    composeOptions {
+        kotlinCompilerExtensionVersion '1.4.5'
+    }
+
     buildTypes {
         release {
             minifyEnabled false
@@ -38,9 +43,6 @@ android {
     buildFeatures {
         compose true
         viewBinding true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion '1.4.0'
     }
     packagingOptions {
         resources {
@@ -128,6 +130,11 @@ dependencies {
 
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation("androidx.room:room-ktx:2.5.2")
+
+    //Scanner
+    implementation 'com.google.zxing:core:3.4.1'
+    implementation 'com.journeyapps:zxing-android-embedded:4.2.0'
+
 
 
 
