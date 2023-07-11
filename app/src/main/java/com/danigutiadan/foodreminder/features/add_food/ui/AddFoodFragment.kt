@@ -3,22 +3,21 @@ package com.danigutiadan.foodreminder.features.add_food.ui
 import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
-import androidx.compose.runtime.getValue
 import android.view.ViewGroup
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.danigutiadan.foodreminder.features.add_food.ui.screens.AddFoodScreen
-import com.danigutiadan.foodreminder.features.dashboard.DashboardActivity
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.foodreminder.utils.Response
+import com.google.zxing.integration.android.IntentIntegrator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.Date
-import com.google.zxing.integration.android.IntentIntegrator
 
 
 @AndroidEntryPoint
@@ -37,11 +36,12 @@ class AddFoodFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val foodTypeState: Response<List<FoodType>> by viewModel.foodTypeList.collectAsState()
-                val profileBitmap: Bitmap? by viewModel.profileBitmap.collectAsState()
+                val profileBitmap: Bitmap? by viewModel.foodBitmap.collectAsState()
                 val foodName: String by viewModel.foodName.collectAsState()
                 val foodQuantity: String by viewModel.foodQuantity.collectAsState()
                 val expiryDate: Date? by viewModel.selectedDate.collectAsState()
                 val daysBeforeExpiration: String by viewModel.daysBeforeExpiration.collectAsState()
+                val imageUrl: String by viewModel.foodImageUrl.collectAsState()
                 AddFoodScreen(
                     backClickListener = { activity?.onBackPressed() },
                     barcodeClickListener = {
@@ -58,9 +58,9 @@ class AddFoodFragment : Fragment() {
                     doCloseDialog = {
                         doClosePictureDialog.value = false
                     },
-                    onTakePicture = { (activity as DashboardActivity).takePicture(viewModel) },
+                    onTakePicture = { (activity as AddFoodActivity).takePicture(viewModel) },
                     onGetExistentPicture = {
-                        (activity as DashboardActivity).takeExistentPicture(
+                        (activity as AddFoodActivity).takeExistentPicture(
                             viewModel
                         )
                     },
@@ -95,6 +95,7 @@ class AddFoodFragment : Fragment() {
                         viewModel.onDaysBeforeExpirationMinusPressed()
 
                     },
+                    imageUrl = imageUrl
                 )
             }
         }
@@ -119,7 +120,6 @@ class AddFoodFragment : Fragment() {
             IntentIntegrator.REQUEST_CODE -> {
                 val result = IntentIntegrator.parseActivityResult(resultCode, data)
                 if (result != null && result.contents != null) {
-                    val scannedBarcode: String = result.contents
                     viewModel.onFoodBarcodeScanned(result.contents)
                 } else {
                     // El escaneo fue cancelado por el usuario

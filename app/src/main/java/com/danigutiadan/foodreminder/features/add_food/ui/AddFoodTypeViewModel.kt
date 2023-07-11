@@ -1,9 +1,12 @@
 package com.danigutiadan.foodreminder.features.add_food.ui
 
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.danigutiadan.foodreminder.features.add_food.domain.models.BarcodeFoodResponse
+import com.danigutiadan.foodreminder.features.add_food.domain.usecases.GetFoodInfoByBarcodeUseCase
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.foodreminder.features.food_type.domain.usecases.GetAllFoodTypesUseCase
 import com.danigutiadan.foodreminder.utils.Response
@@ -14,20 +17,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import java.io.IOException
+import java.net.URL
 import java.util.Date
 import javax.inject.Inject
 
+
 @HiltViewModel
 class AddFoodTypeViewModel @Inject constructor(
-    private val getAllFoodTypesUseCase: GetAllFoodTypesUseCase
+    private val getAllFoodTypesUseCase: GetAllFoodTypesUseCase,
+    private val getFoodInfoByBarcode: GetFoodInfoByBarcodeUseCase,
 ) : ViewModel() {
 
 
     val bottomSheetState = MutableStateFlow(BottomSheetState(BottomSheetValue.Collapsed))
     var imageUri: Uri? = null
 
-    private val _profileBitmap = MutableStateFlow<Bitmap?>(null)
-    val profileBitmap: StateFlow<Bitmap?> = _profileBitmap
+    private val _foodBitmap = MutableStateFlow<Bitmap?>(null)
+    val foodBitmap: StateFlow<Bitmap?> = _foodBitmap
 
     private val _foodTypeList = MutableStateFlow<Response<List<FoodType>>>(Response.Loading)
     val foodTypeList: StateFlow<Response<List<FoodType>>> = _foodTypeList
@@ -47,6 +55,13 @@ class AddFoodTypeViewModel @Inject constructor(
     private val _daysBeforeExpiration = MutableStateFlow("0")
     val daysBeforeExpiration: StateFlow<String> = _daysBeforeExpiration
 
+    private val _foodImageUrl = MutableStateFlow("")
+    val foodImageUrl: StateFlow<String> = _foodImageUrl
+
+    private val _foodTypeByBarcodeState =
+        MutableStateFlow<Response<BarcodeFoodResponse?>>(Response.Loading)
+    val foodTypeByBarcodeState: StateFlow<Response<BarcodeFoodResponse?>> = _foodTypeByBarcodeState
+
     fun getAllFoodTypes() {
         getAllFoodTypesUseCase.execute()
             .onEach { _foodTypeList.value = Response.Loading }
@@ -55,7 +70,9 @@ class AddFoodTypeViewModel @Inject constructor(
     }
 
     fun updateProfileBitmap(bitmap: Bitmap) {
-        _profileBitmap.value = bitmap
+        _foodBitmap.value = bitmap
+        _foodImageUrl.value = ""
+
         //uploadUserImageUseCase.execute(bitmap)
     }
 
@@ -76,8 +93,22 @@ class AddFoodTypeViewModel @Inject constructor(
     }
 
     fun onFoodBarcodeScanned(barcode: String) {
-        //Getfoodbybarcode
+        viewModelScope.launch {
+            _foodTypeByBarcodeState.value = Response.Loading
+            getFoodInfoByBarcode.execute(barcode)
+                .collect { response ->
+                    _foodTypeByBarcodeState.value = response
+
+                    if(response is Response.Success) {
+                        if (response.data?.products?.isNotEmpty() == true) {
+                            _foodName.value = response.data?.products?.first()?.name.toString()
+                            _foodImageUrl.value = response.data?.products?.first()?.imageUrl ?: ""
+                        }
+                    }
+                }
+        }
     }
+
 
     fun onDaysBeforeExpiration(daysBeforeExpired: String) {
         _daysBeforeExpiration.value = daysBeforeExpired

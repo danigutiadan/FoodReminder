@@ -1,11 +1,13 @@
 package com.danigutiadan.foodreminder.utils
 
 import android.app.Activity
+import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
@@ -38,14 +40,34 @@ object ImageUtils {
         return uri
     }
 
-//    fun captureImage() {
-//        val intentCamera = Intent("android.media.action.IMAGE_CAPTURE")
-//        val filePhoto = File(Environment.getExternalStorageDirectory(), "Pic.jpg")
-//        val imageUri = Uri.fromFile(filePhoto)
-//        MyApplicationGlobal.imageUri = imageUri.getPath()
-//        intentCamera.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-//        startActivityForResult(intentCamera, TAKE_PICTURE)
-//    }
+    fun rotateBitmap(bitmap: Bitmap, imagePath: String): Bitmap {
+        val exif = ExifInterface(imagePath)
+        val orientation =
+            exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
+
+        val matrix = Matrix()
+        when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
+            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
+            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
+        }
+
+        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+    }
+
+    fun getImageFilePath(uri: Uri, contentResolver: ContentResolver): String? {
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = contentResolver.query(uri, projection, null, null, null)
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                return it.getString(columnIndex)
+            }
+        }
+
+        return null
+    }
 
     fun rotateImage(source: Bitmap, angle: Float): Bitmap? {
         val matrix = Matrix()
@@ -55,20 +77,6 @@ object ImageUtils {
             matrix, true
         )
     }
-
-//    fun rotateImage(imagePath: String, bitmap: Bitmap): Bitmap {
-//        val exif = ExifInterface(imagePath)
-//        val orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)
-//        val matrix = Matrix()
-//
-//        when (orientation) {
-//            ExifInterface.ORIENTATION_ROTATE_90 -> matrix.postRotate(90f)
-//            ExifInterface.ORIENTATION_ROTATE_180 -> matrix.postRotate(180f)
-//            ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
-//        }
-
-//        return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-//    }
 
      fun saveBitmapToGallery(bitmap: Bitmap, context: Context, displayName: String) {
         // Get a ContentResolver instance

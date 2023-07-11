@@ -1,4 +1,8 @@
 package com.danigutiadan.foodreminder.di
+
+import com.danigutiadan.foodreminder.features.add_food.data.datasource.AddFoodDataSource
+import com.danigutiadan.foodreminder.features.add_food.data.repository.AddFoodRepositoryImpl
+import com.danigutiadan.foodreminder.features.add_food.domain.repository.AddFoodRepository
 import com.danigutiadan.foodreminder.features.dashboard.home.data.datasource.HomeDataSource
 import com.danigutiadan.foodreminder.features.dashboard.home.data.repository.HomeRepositoryImpl
 import com.danigutiadan.foodreminder.features.dashboard.home.domain.repository.HomeRepository
@@ -31,29 +35,42 @@ object RepositoryModule {
     //REPOSITORIES-------------------------
     @Singleton
     @Provides
-    fun provideLoginRepository(authDataSource: AuthDataSource) : LoginRepository = LoginRepositoryImpl(authDataSource)
+    fun provideLoginRepository(authDataSource: AuthDataSource): LoginRepository =
+        LoginRepositoryImpl(authDataSource)
 
     @Singleton
     @Provides
-    fun provideRegisterRepository(authDataSource: AuthDataSource) : RegisterRepository = RegisterRepositoryImpl(authDataSource)
+    fun provideRegisterRepository(authDataSource: AuthDataSource): RegisterRepository =
+        RegisterRepositoryImpl(authDataSource)
 
     @Singleton
     @Provides
-    fun provideAddUserInfoRepository(addUserInfoDataSource: AddUserInfoDataSource): AddUserInfoRepository = AddUserInfoRepositoryImpl(addUserInfoDataSource)
+    fun provideAddUserInfoRepository(addUserInfoDataSource: AddUserInfoDataSource): AddUserInfoRepository =
+        AddUserInfoRepositoryImpl(addUserInfoDataSource)
 
     @Singleton
     @Provides
-    fun provideUserRepository(userDataSource: UserDataSource): UserRepository = UserRepositoryImpl(userDataSource = userDataSource)
+    fun provideUserRepository(userDataSource: UserDataSource): UserRepository =
+        UserRepositoryImpl(userDataSource = userDataSource)
 
     @Singleton
     @Provides
-    fun provideHomeRepository(homeDataSource: HomeDataSource): HomeRepository = HomeRepositoryImpl(homeDataSource = homeDataSource)
+    fun provideHomeRepository(homeDataSource: HomeDataSource): HomeRepository =
+        HomeRepositoryImpl(homeDataSource = homeDataSource)
 
     @Singleton
     @Provides
-    fun provideProfileRepository(homeDataSource: HomeDataSource): ProfileRepository = ProfileRepositoryImpl(homeDataSource = homeDataSource)
+    fun provideProfileRepository(homeDataSource: HomeDataSource): ProfileRepository =
+        ProfileRepositoryImpl(homeDataSource = homeDataSource)
 
     @Singleton
     @Provides
-    fun provideFoodTypeRepository(foodTypeDataSource: FoodTypeDataSource): FoodTypeRepository = FoodTypeRepositoryImpl(foodTypeDataSource)
+    fun provideFoodTypeRepository(foodTypeDataSource: FoodTypeDataSource): FoodTypeRepository =
+        FoodTypeRepositoryImpl(foodTypeDataSource)
+
+    @Singleton
+    @Provides
+    fun provideAddFoodRepository(addFoodTypeDataSource: AddFoodDataSource): AddFoodRepository =
+        AddFoodRepositoryImpl(addFoodTypeDataSource)
+
 }

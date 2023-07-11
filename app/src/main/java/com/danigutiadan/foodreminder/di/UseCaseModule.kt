@@ -1,5 +1,7 @@
 package com.danigutiadan.foodreminder.di
 
+import com.danigutiadan.foodreminder.features.add_food.domain.repository.AddFoodRepository
+import com.danigutiadan.foodreminder.features.add_food.domain.usecases.GetFoodInfoByBarcodeUseCase
 import com.danigutiadan.foodreminder.features.dashboard.home.domain.repository.HomeRepository
 import com.danigutiadan.foodreminder.features.dashboard.home.domain.usecases.GetAllFoodUseCase
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.repository.ProfileRepository
@@ -32,29 +34,43 @@ object UseCaseModule {
 
     @Singleton
     @Provides
-    fun provideEmailRegisterUseCase(repository: RegisterRepository) = EmailRegisterUseCase(repository)
+    fun provideEmailRegisterUseCase(repository: RegisterRepository) =
+        EmailRegisterUseCase(repository)
 
     @Singleton
     @Provides
-    fun provideUploadUserImageUseCase(addUserInfoRepository: AddUserInfoRepository) = UploadUserImageUseCase(addUserInfoRepository)
+    fun provideUploadUserImageUseCase(addUserInfoRepository: AddUserInfoRepository) =
+        UploadUserImageUseCase(addUserInfoRepository)
 
     @Singleton
     @Provides
-    fun provideGetUserInfoUseCase(userRepository: UserRepository) = GetUserInfoUseCase(userRepository = userRepository)
+    fun provideGetUserInfoUseCase(userRepository: UserRepository) =
+        GetUserInfoUseCase(userRepository = userRepository)
 
     @Singleton
     @Provides
-    fun provideLogoutUseCase(profileRepository: ProfileRepository) = LogoutUseCase(profileRepository = profileRepository)
+    fun provideLogoutUseCase(profileRepository: ProfileRepository) =
+        LogoutUseCase(profileRepository = profileRepository)
 
     @Singleton
     @Provides
-    fun provideGetAllFoodUseCase(homeRepository: HomeRepository) = GetAllFoodUseCase(homeRepository = homeRepository)
+    fun provideGetAllFoodUseCase(homeRepository: HomeRepository) =
+        GetAllFoodUseCase(homeRepository = homeRepository)
 
     @Singleton
     @Provides
-    fun provideInsertFoodTypeUseCase(foodTypeRepository: FoodTypeRepository) = InsertFoodTypeUseCase(foodTypeRepository = foodTypeRepository)
+    fun provideInsertFoodTypeUseCase(foodTypeRepository: FoodTypeRepository) =
+        InsertFoodTypeUseCase(foodTypeRepository = foodTypeRepository)
 
     @Singleton
     @Provides
-    fun provideGetAllFoodTypesUseCase(foodTypeRepository: FoodTypeRepository) = GetAllFoodTypesUseCase(foodTypeRepository = foodTypeRepository)
+    fun provideGetAllFoodTypesUseCase(foodTypeRepository: FoodTypeRepository) =
+        GetAllFoodTypesUseCase(foodTypeRepository = foodTypeRepository)
+
+    @Singleton
+    @Provides
+    fun provideGetFoodInfoByBarcodeUseCase(addFoodRepository: AddFoodRepository) =
+        GetFoodInfoByBarcodeUseCase(addFoodRepository = addFoodRepository)
+
+
 }

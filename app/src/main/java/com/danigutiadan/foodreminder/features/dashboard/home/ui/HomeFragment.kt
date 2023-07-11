@@ -1,5 +1,6 @@
 package com.danigutiadan.foodreminder.features.dashboard.home.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,8 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import com.danigutiadan.foodreminder.features.add_food.ui.AddFoodActivity
+import com.danigutiadan.foodreminder.features.dashboard.DashboardActivity
 import com.danigutiadan.foodreminder.features.dashboard.home.ui.screens.HomeScreen
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -23,7 +26,8 @@ class HomeFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 HomeScreen(buttonListener = {
-                    findNavController().navigate(HomeFragmentDirections.actionDashboardNavigationHomeToAddFoodFragment())
+                   // findNavController().navigate(HomeFragmentDirections.actionDashboardNavigationHomeToAddFoodFragment())
+                    (activity as DashboardActivity).navigateToAddFood()
                 })
             }
         }

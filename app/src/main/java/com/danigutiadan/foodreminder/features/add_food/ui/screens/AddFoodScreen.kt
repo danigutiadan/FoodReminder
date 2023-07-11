@@ -1,8 +1,6 @@
 package com.danigutiadan.foodreminder.features.add_food.ui.screens
 
 import android.graphics.Bitmap
-import android.view.ContextThemeWrapper
-import android.widget.CalendarView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -28,9 +26,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Scaffold
@@ -52,11 +48,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.viewinterop.AndroidView
 import coil.compose.rememberAsyncImagePainter
 import com.danigutiadan.foodreminder.R
 import com.danigutiadan.foodreminder.features.add_food.ui.components.CustomDatePickerDialog
@@ -68,7 +62,6 @@ import com.dokar.sheets.BottomSheetState
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -97,6 +90,7 @@ fun AddFoodScreen(
     onQuantityMinusPressed: () -> Unit,
     onDaysBeforeExpirationPlusPressed: () -> Unit,
     onDaysBeforeExpirationMinusPressed: () -> Unit,
+    imageUrl: String
 ) {
     val scope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
@@ -167,7 +161,11 @@ fun AddFoodScreen(
 
                                 ) {
                                 //Image
-                                FoodImage(foodBitmap) { scope.launch { bottomSheetPictureDialogState.expand() } }
+                                FoodImage(
+                                    foodBitmap,
+                                    { scope.launch { bottomSheetPictureDialogState.expand() } },
+                                    imageUrl
+                                )
                             }
 
                             Box(
@@ -178,7 +176,7 @@ fun AddFoodScreen(
                                 contentAlignment = Alignment.BottomEnd
                             ) {
                                 Image(
-                                    painter = painterResource(id = R.drawable.ic_photo),
+                                    painter = painterResource(id = R.drawable.ic_camera_rounded),
                                     contentDescription = ""
                                 )
                             }
@@ -189,7 +187,7 @@ fun AddFoodScreen(
 
 
                 }
-                AddFoodSpacer()
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(text = "¿Cuál es el nombre de tu producto?")
                 Spacer(modifier = Modifier.height(5.dp))
                 AddFoodTextField(
@@ -199,19 +197,16 @@ fun AddFoodScreen(
                         onFoodNameChanged(it)
                     })
 
-                AddFoodSpacer()
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(text = "¿Cuántas unidades, paquetes, bricks... tienes?")
                 Spacer(modifier = Modifier.height(5.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-//                    Box(modifier = Modifier.align(Alignment.CenterVertically)) {
-//                        Text(text = "Cantidad", style = MaterialTheme.typography.h6)
-//                    }
 
                     AddFoodQuantityTextField(
-                        input = foodQuantity.toString(),
+                        input = foodQuantity,
                         textAlign = TextAlign.Start,
                         onValueChanged = {
                             onFoodQuantityChanged(it)
@@ -234,7 +229,7 @@ fun AddFoodScreen(
                     }
 
                 }
-                AddFoodSpacer()
+                Spacer(modifier = Modifier.height(12.dp))
 
                 when (foodTypeListState) {
                     is Response.Success -> {
@@ -270,7 +265,7 @@ fun AddFoodScreen(
                     fontSize = 18.sp,
                     color = if (formatDateToString(dateSelected).isNullOrBlank()) Color.Gray else Color.Black
                 )
-                AddFoodSpacer()
+                Spacer(modifier = Modifier.height(12.dp))
 
                 if (showDatePicker.value) {
                     CustomDatePickerDialog(
@@ -283,7 +278,7 @@ fun AddFoodScreen(
                         })
                 }
 
-                Text(text = "¿Cuando quieres que te avisamos?")
+                Text(text = "¿Cuántos días antes de la fecha de caducidad deseas recibir una notificación?")
                 Spacer(modifier = Modifier.height(5.dp))
                 AddTimeLeftTextField(
                     input = daysBeforeExpiration,
@@ -329,20 +324,12 @@ fun AddFoodScreen(
 }
 
 @Composable
-fun AddFoodSpacer() {
-    Spacer(modifier = Modifier.height(7.dp))
-//    Box(modifier = Modifier
-//        .fillMaxWidth()
-//        .height(1.dp)
-//        .background(Color.LightGray))
-    Spacer(modifier = Modifier.height(5.dp))
-}
-
-@Composable
-fun FoodImage(imageBitmap: Bitmap?, onClickImage: () -> Unit) {
-    val painter = if (imageBitmap != null)
+fun FoodImage(imageBitmap: Bitmap?, onClickImage: () -> Unit, imageUrl: String) {
+    val painter = if (imageUrl.isNotBlank())
+        rememberAsyncImagePainter(imageUrl)
+    else if (imageBitmap != null)
         rememberAsyncImagePainter(imageBitmap)
-    else painterResource(R.drawable.ic_fast_food)
+    else painterResource(R.drawable.add_food_placeholder)
 
     Image(painter = painter,
         contentDescription = "avatar",
@@ -350,7 +337,7 @@ fun FoodImage(imageBitmap: Bitmap?, onClickImage: () -> Unit) {
         modifier = Modifier
             .height(130.dp)
             .width(110.dp)
-            .clip(RoundedCornerShape(5.dp))
+            .clip(RoundedCornerShape(10.dp))
             .clickable {
                 onClickImage()
             }
@@ -412,26 +399,7 @@ fun FoodTypeDropdownMenu(foodTypeList: List<FoodType>, onFoodTypeSelected: (Food
             }
         }
 
-        AddFoodSpacer()
-    }
-}
-
-@Composable
-fun MyCalendarView() {
-    val selectedDate = remember { mutableStateOf(Calendar.getInstance()) }
-
-    Box(modifier = Modifier.padding(30.dp)) {
-        AndroidView(factory = { context ->
-            CalendarView(ContextThemeWrapper(context, R.style.CalendarStyle)).apply {
-                setOnDateChangeListener { _, year, month, dayOfMonth ->
-                    val calendar = Calendar.getInstance().apply {
-                        set(year, month, dayOfMonth)
-                    }
-                    selectedDate.value = calendar
-                }
-            }
-        })
-
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }
 
@@ -440,11 +408,11 @@ fun AddFoodTextField(
     input: String,
     textAlign: TextAlign? = null,
     placeHolder: String,
-    modifier: Modifier = Modifier.fillMaxWidth(),
     onValueChanged: (String) -> Unit
 ) {
     BasicTextField(
         value = input,
+        singleLine = true,
         onValueChange = { newText ->
             onValueChanged(newText)
         },
@@ -455,7 +423,8 @@ fun AddFoodTextField(
         ),
         decorationBox = { innerTextField ->
             Box(
-                modifier = modifier // margin left and right
+                modifier = Modifier
+                    .fillMaxWidth() // margin left and right
                     .border(
                         width = 2.dp,
                         color = Color.White,
@@ -514,8 +483,7 @@ fun AddFoodQuantityTextField(
                         color = Color.Black
                     )
                 )
-                var text = ""
-                text = if (input.isNotBlank()) {
+                val text: String = if (input.isNotBlank()) {
                     if (input.toInt() == 1) " unidad" else " unidades"
                 } else
                     " unidades"
@@ -562,8 +530,7 @@ fun AddTimeLeftTextField(
                         color = Color.Black
                     )
                 )
-                var text = ""
-                text = if (input.isNotBlank()) {
+                val text: String = if (input.isNotBlank()) {
                     if (input.toInt() == 1) " día antes" else " días antes"
                 } else
                     " días antes"
@@ -621,5 +588,6 @@ fun PreviewAddFoodScreen() {
         {},
         {},
         {},
+        ""
     )
 }
