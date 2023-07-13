@@ -24,6 +24,8 @@ private val viewModel: HomeViewModel by viewModels()
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+
         // Inflate the layout for this fragment
         return ComposeView(requireContext()).apply {
             setContent {

@@ -1,6 +1,7 @@
 package com.danigutiadan.foodreminder.di
 
 import android.app.Application
+import com.danigutiadan.foodreminder.FoodReminderNavigator
 import com.danigutiadan.foodreminder.Preferences
 import com.danigutiadan.foodreminder.api.ApiService
 import com.danigutiadan.foodreminder.database.FoodReminderDatabase
@@ -85,4 +86,8 @@ object AppModule {
     @Singleton
     @Provides
     fun provideApiService(retrofit: Retrofit): ApiService = retrofit.create(ApiService::class.java)
+
+    @Singleton
+    @Provides
+    fun provideNavigator(app: Application): FoodReminderNavigator = FoodReminderNavigator(app)
 }

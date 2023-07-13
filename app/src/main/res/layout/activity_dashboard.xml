@@ -11,13 +11,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:defaultNavHost="true"
-        app:navGraph="@navigation/nav_dashboard"
-        android:layout_above="@id/bnv_dashboard"/>
+        app:navGraph="@navigation/nav_dashboard"/>
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bnv_dashboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="gone"
         android:layout_alignParentBottom="true"
         app:itemTextColor="@color/bottom_nav_color_state"
         app:itemIconTint="@color/bottom_nav_color_state"

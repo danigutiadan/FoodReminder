@@ -6,6 +6,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
@@ -13,7 +14,11 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.FileProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
 import com.danigutiadan.foodreminder.features.onboarding.ui.REQUEST_CAPTURE_IMAGE
+import java.io.ByteArrayOutputStream
 import java.io.File
 
 
@@ -39,6 +44,36 @@ object ImageUtils {
         context.startActivityForResult(intent, REQUEST_CAPTURE_IMAGE)
         return uri
     }
+
+    fun bitmapToByteArray(bitmap: Bitmap?): ByteArray? {
+        if (bitmap != null) {
+            val stream = ByteArrayOutputStream()
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+            return stream.toByteArray()
+        }
+        return null
+    }
+
+    fun imageUrlToBitmap(context: Context, imageUrl: String, callback: (Bitmap?) -> Unit) {
+        Glide.with(context)
+            .asBitmap()
+            .load(imageUrl)
+            .into(object : SimpleTarget<Bitmap>() {
+                override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                    callback(resource) // Pasar el Bitmap descargado a la devolución de llamada
+                }
+            })
+    }
+
+
+    fun byteArrayToBitmap(byteArray: ByteArray?): Bitmap? {
+        if (byteArray != null) {
+            return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+        }
+        return null
+    }
+
+
 
     fun rotateBitmap(bitmap: Bitmap, imagePath: String): Bitmap {
         val exif = ExifInterface(imagePath)

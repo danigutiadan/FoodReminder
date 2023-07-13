@@ -1,21 +1,20 @@
 package com.danigutiadan.foodreminder.features.dashboard.home.ui
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.findNavController
-import com.danigutiadan.foodreminder.features.add_food.ui.AddFoodActivity
-import com.danigutiadan.foodreminder.features.dashboard.DashboardActivity
+import com.danigutiadan.foodreminder.BaseFragment
 import com.danigutiadan.foodreminder.features.dashboard.home.ui.screens.HomeScreen
+import com.danigutiadan.foodreminder.features.food_detail.data.FoodWithFoodType
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class HomeFragment : Fragment() {
+class HomeFragment : BaseFragment() {
     private val homeViewModel: HomeViewModel by viewModels()
 
     override fun onCreateView(
@@ -25,12 +24,24 @@ class HomeFragment : Fragment() {
         // Inflate the layout for this fragment
         return ComposeView(requireContext()).apply {
             setContent {
-                HomeScreen(buttonListener = {
-                   // findNavController().navigate(HomeFragmentDirections.actionDashboardNavigationHomeToAddFoodFragment())
-                    (activity as DashboardActivity).navigateToAddFood()
-                })
+                val foodList: List<FoodWithFoodType> by homeViewModel.foodListState.collectAsState()
+                HomeScreen(
+                    addFoodButtonListener = {
+                        // findNavController().navigate(HomeFragmentDirections.actionDashboardNavigationHomeToAddFoodFragment())
+                        navigator.navigateToAddFood(activity, false)
+                    }, foodList,
+                    onEditButtonPressed = {},
+                    onDeleteButtonPressed = {
+                        homeViewModel.deleteFoodFromList(it)
+                    }
+                )
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        homeViewModel.getAllFood()
     }
 
 }

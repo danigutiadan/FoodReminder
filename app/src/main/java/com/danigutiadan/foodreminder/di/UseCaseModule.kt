@@ -2,6 +2,7 @@ package com.danigutiadan.foodreminder.di
 
 import com.danigutiadan.foodreminder.features.add_food.domain.repository.AddFoodRepository
 import com.danigutiadan.foodreminder.features.add_food.domain.usecases.GetFoodInfoByBarcodeUseCase
+import com.danigutiadan.foodreminder.features.add_food.domain.usecases.SaveFoodUseCase
 import com.danigutiadan.foodreminder.features.dashboard.home.domain.repository.HomeRepository
 import com.danigutiadan.foodreminder.features.dashboard.home.domain.usecases.GetAllFoodUseCase
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.repository.ProfileRepository
@@ -71,6 +72,11 @@ object UseCaseModule {
     @Provides
     fun provideGetFoodInfoByBarcodeUseCase(addFoodRepository: AddFoodRepository) =
         GetFoodInfoByBarcodeUseCase(addFoodRepository = addFoodRepository)
+
+    @Singleton
+    @Provides
+    fun provideSaveFoodUseCase(addFoodRepository: AddFoodRepository) =
+        SaveFoodUseCase(addFoodRepository = addFoodRepository)
 
 
 }

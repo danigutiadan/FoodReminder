@@ -163,9 +163,7 @@ fun AddProfileImageButtonSheetDialog(
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.h6,
             modifier = Modifier
-                .border(
-                    BorderStroke(1.dp, Color.Cyan), RoundedCornerShape(15.dp)
-                )
+                .clip(RoundedCornerShape(15.dp))
                 .background(Color.White)
                 .fillMaxWidth()
                 .padding(10.dp)
@@ -174,6 +172,11 @@ fun AddProfileImageButtonSheetDialog(
     }
 
 
+}
+@Preview
+@Composable
+fun Preview() {
+    AddProfileImageButtonSheetDialog(onClick = {  }, text = "Tomar foto", interactionSource = MutableInteractionSource())
 }
 
 @Composable

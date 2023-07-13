@@ -56,14 +56,13 @@ import com.danigutiadan.foodreminder.R
 import com.danigutiadan.foodreminder.features.add_food.ui.components.CustomDatePickerDialog
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.foodreminder.features.onboarding.adduserinfo.ui.screens.AddProfileImageButtonSheetDialog
+import com.danigutiadan.foodreminder.utils.DateUtils.formatDateToString
 import com.danigutiadan.foodreminder.utils.Response
 import com.dokar.sheets.BottomSheetLayout
 import com.dokar.sheets.BottomSheetState
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 
 @Composable
 fun AddFoodScreen(
@@ -90,7 +89,12 @@ fun AddFoodScreen(
     onQuantityMinusPressed: () -> Unit,
     onDaysBeforeExpirationPlusPressed: () -> Unit,
     onDaysBeforeExpirationMinusPressed: () -> Unit,
-    imageUrl: String
+    imageUrl: String,
+    isNameError: Boolean,
+    isQuantityError: Boolean,
+    isFoodTypeError: Boolean,
+    isExpiryDateError: Boolean,
+    isDaysBeforeExpirationError: Boolean,
 ) {
     val scope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
@@ -155,7 +159,7 @@ fun AddFoodScreen(
 
                             Box(
                                 modifier = Modifier
-                                    .height(130.dp)
+                                    .height(190.dp)
                                     .width(110.dp)
                                     .align(Alignment.Center),
 
@@ -190,9 +194,10 @@ fun AddFoodScreen(
                 Spacer(modifier = Modifier.height(12.dp))
                 Text(text = "¿Cuál es el nombre de tu producto?")
                 Spacer(modifier = Modifier.height(5.dp))
-                AddFoodTextField(
+                AddFoodNameTextField(
                     input = foodName,
                     placeHolder = "Nombre del producto",
+                    isNameError = isNameError,
                     onValueChanged = {
                         onFoodNameChanged(it)
                     })
@@ -208,6 +213,7 @@ fun AddFoodScreen(
                     AddFoodQuantityTextField(
                         input = foodQuantity,
                         textAlign = TextAlign.Start,
+                        isQuantityError = isQuantityError,
                         onValueChanged = {
                             onFoodQuantityChanged(it)
                         })
@@ -235,7 +241,8 @@ fun AddFoodScreen(
                     is Response.Success -> {
                         FoodTypeDropdownMenu(
                             foodTypeList = foodTypeListState.data,
-                            onFoodTypeSelected = onFoodTypeSelected
+                            onFoodTypeSelected = onFoodTypeSelected,
+                            isFoodTypeError
                         )
                     }
 
@@ -247,24 +254,8 @@ fun AddFoodScreen(
 
                 Text(text = "Introduce la fecha de caducidad de tu producto")
                 Spacer(modifier = Modifier.height(5.dp))
-                Text(
-                    modifier = Modifier
-                        .border(
-                            width = 2.dp,
-                            color = Color.White,
-                            shape = RoundedCornerShape(size = 12.dp)
-                        )
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color.White)
-                        .fillMaxWidth()
-                        .padding(start = 12.dp, end = 30.dp, top = 10.dp, bottom = 10.dp)
-                        .noRippleClickable { showDatePicker.value = true },
-                    text = if (formatDateToString(dateSelected).isNullOrBlank()) "Fecha de caducidad" else formatDateToString(
-                        dateSelected
-                    )!!,
-                    fontSize = 18.sp,
-                    color = if (formatDateToString(dateSelected).isNullOrBlank()) Color.Gray else Color.Black
-                )
+
+                ExpiryDateText(showDatePicker, dateSelected, isExpiryDateError)
                 Spacer(modifier = Modifier.height(12.dp))
 
                 if (showDatePicker.value) {
@@ -284,17 +275,20 @@ fun AddFoodScreen(
                     input = daysBeforeExpiration,
                     onValueChanged = { onDaysBeforeExpiration(it) },
                     onDaysBeforeExpirationPlusPressed = { onDaysBeforeExpirationPlusPressed() },
-                    onDaysBeforeExpirationMinusPressed = { onDaysBeforeExpirationMinusPressed() })
+                    onDaysBeforeExpirationMinusPressed = { onDaysBeforeExpirationMinusPressed() },
+                    isDaysBeforeExpirationError = isDaysBeforeExpirationError
+                )
 
             }
         }
 
     }
 
-    if (bottomSheetPictureDialogState.visible) BottomSheetLayout(state = bottomSheetPictureDialogState,
+    if (bottomSheetPictureDialogState.visible) BottomSheetLayout(backgroundColor = Color(0xFFECECEC),
+        state = bottomSheetPictureDialogState,
         content = {
 
-            Column {
+            Column(Modifier.background(Color(0xFFECECEC))) {
                 AddProfileImageButtonSheetDialog(
                     onClick = { onTakePicture() },
                     text = "Tomar foto",
@@ -324,6 +318,32 @@ fun AddFoodScreen(
 }
 
 @Composable
+private fun ExpiryDateText(
+    showDatePicker: MutableState<Boolean>,
+    dateSelected: Date?,
+    isExpiryDateError: Boolean
+) {
+    Text(
+        modifier = Modifier
+            .border(
+                width = 1.5.dp,
+                color = if (isExpiryDateError) Color(0xFFFF7779) else Color.White,
+                shape = RoundedCornerShape(size = 12.dp)
+            )
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color.White)
+            .fillMaxWidth()
+            .padding(start = 12.dp, end = 30.dp, top = 10.dp, bottom = 10.dp)
+            .noRippleClickable { showDatePicker.value = true },
+        text = if (formatDateToString(dateSelected).isNullOrBlank()) "Fecha de caducidad" else formatDateToString(
+            dateSelected
+        )!!,
+        fontSize = 18.sp,
+        color = if (formatDateToString(dateSelected).isNullOrBlank()) Color.Gray else Color.Black
+    )
+}
+
+@Composable
 fun FoodImage(imageBitmap: Bitmap?, onClickImage: () -> Unit, imageUrl: String) {
     val painter = if (imageUrl.isNotBlank())
         rememberAsyncImagePainter(imageUrl)
@@ -335,7 +355,7 @@ fun FoodImage(imageBitmap: Bitmap?, onClickImage: () -> Unit, imageUrl: String) 
         contentDescription = "avatar",
         contentScale = ContentScale.Crop,
         modifier = Modifier
-            .height(130.dp)
+            .height(160.dp)
             .width(110.dp)
             .clip(RoundedCornerShape(10.dp))
             .clickable {
@@ -345,13 +365,6 @@ fun FoodImage(imageBitmap: Bitmap?, onClickImage: () -> Unit, imageUrl: String) 
     )
 }
 
-fun formatDateToString(date: Date?): String? {
-    return if (date != null) {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        dateFormat.format(date)
-    } else
-        null
-}
 
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
     clickable(indication = null,
@@ -361,7 +374,11 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
 }
 
 @Composable
-fun FoodTypeDropdownMenu(foodTypeList: List<FoodType>, onFoodTypeSelected: (FoodType) -> Unit) {
+fun FoodTypeDropdownMenu(
+    foodTypeList: List<FoodType>,
+    onFoodTypeSelected: (FoodType) -> Unit,
+    isFoodTypeError: Boolean
+) {
     val dropdownExpanded = remember { mutableStateOf(false) }
     val selectedOption: MutableState<FoodType?> = remember { mutableStateOf(null) }
 
@@ -374,8 +391,8 @@ fun FoodTypeDropdownMenu(foodTypeList: List<FoodType>, onFoodTypeSelected: (Food
             color = if (selectedOption.value?.name.isNullOrBlank()) Color.Gray else Color.Black,
             modifier = Modifier
                 .border(
-                    width = 2.dp,
-                    color = Color.White,
+                    width = 1.5.dp,
+                    color = if (isFoodTypeError) Color(0xFFFF7779) else Color.White,
                     shape = RoundedCornerShape(size = 12.dp)
                 )
                 .clip(RoundedCornerShape(12.dp))
@@ -404,11 +421,12 @@ fun FoodTypeDropdownMenu(foodTypeList: List<FoodType>, onFoodTypeSelected: (Food
 }
 
 @Composable
-fun AddFoodTextField(
+fun AddFoodNameTextField(
     input: String,
     textAlign: TextAlign? = null,
     placeHolder: String,
-    onValueChanged: (String) -> Unit
+    onValueChanged: (String) -> Unit,
+    isNameError: Boolean
 ) {
     BasicTextField(
         value = input,
@@ -426,8 +444,8 @@ fun AddFoodTextField(
                 modifier = Modifier
                     .fillMaxWidth() // margin left and right
                     .border(
-                        width = 2.dp,
-                        color = Color.White,
+                        width = 1.5.dp,
+                        color = if (isNameError) Color(0xFFFF7779) else Color.White,
                         shape = RoundedCornerShape(size = 12.dp)
                     )
                     .clip(RoundedCornerShape(12.dp))
@@ -452,7 +470,8 @@ fun AddFoodTextField(
 fun AddFoodQuantityTextField(
     input: String,
     textAlign: TextAlign? = null,
-    onValueChanged: (String) -> Unit
+    onValueChanged: (String) -> Unit,
+    isQuantityError: Boolean
 ) {
 
     Row() {
@@ -460,8 +479,8 @@ fun AddFoodQuantityTextField(
             modifier = Modifier // margin left and right
 
                 .border(
-                    width = 2.dp,
-                    color = Color.White,
+                    width = 1.5.dp,
+                    color = if (isQuantityError) Color(0xFFFF7779) else Color.White,
                     shape = RoundedCornerShape(size = 12.dp)
                 )
                 .clip(RoundedCornerShape(12.dp))
@@ -501,14 +520,15 @@ fun AddTimeLeftTextField(
     textAlign: TextAlign? = null,
     onValueChanged: (String) -> Unit,
     onDaysBeforeExpirationPlusPressed: () -> Unit,
-    onDaysBeforeExpirationMinusPressed: () -> Unit
+    onDaysBeforeExpirationMinusPressed: () -> Unit,
+    isDaysBeforeExpirationError: Boolean
 ) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(
             modifier = Modifier // margin left and right
                 .border(
-                    width = 2.dp,
-                    color = Color.White,
+                    width = 1.5.dp,
+                    color = if (isDaysBeforeExpirationError) Color(0xFFFF7779) else Color.White,
                     shape = RoundedCornerShape(size = 12.dp)
                 )
                 .clip(RoundedCornerShape(12.dp))
@@ -588,6 +608,11 @@ fun PreviewAddFoodScreen() {
         {},
         {},
         {},
-        ""
+        "",
+        true,
+        true,
+        true,
+        true,
+        true,
     )
 }

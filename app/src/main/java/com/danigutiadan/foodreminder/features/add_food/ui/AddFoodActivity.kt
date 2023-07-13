@@ -3,19 +3,13 @@ package com.danigutiadan.foodreminder.features.add_food.ui
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.Matrix
-import android.media.ExifInterface
-import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import com.danigutiadan.foodreminder.R
+import com.danigutiadan.foodreminder.BaseActivity
 import com.danigutiadan.foodreminder.databinding.ActivityAddFoodBinding
-import com.danigutiadan.foodreminder.databinding.ActivityDashboardBinding
 import com.danigutiadan.foodreminder.features.onboarding.ui.MY_PERMISSIONS_REQUEST_CAMERA
 import com.danigutiadan.foodreminder.features.onboarding.ui.REQUEST_CAPTURE_IMAGE
 import com.danigutiadan.foodreminder.features.onboarding.ui.REQUEST_CODE_IMAGE_PICKER
@@ -26,8 +20,8 @@ import com.dokar.sheets.BottomSheetValue
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class AddFoodActivity : AppCompatActivity() {
-    private lateinit var addFoodTypeViewModel: AddFoodTypeViewModel
+class AddFoodActivity : BaseActivity() {
+    private lateinit var addFoodViewModel: AddFoodViewModel
     private lateinit var binding: ActivityAddFoodBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +31,8 @@ class AddFoodActivity : AppCompatActivity() {
     }
 
 
-    fun takePicture(viewModel: AddFoodTypeViewModel) {
-        addFoodTypeViewModel = viewModel
+    fun takePicture(viewModel: AddFoodViewModel) {
+        addFoodViewModel = viewModel
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.CAMERA
@@ -50,14 +44,14 @@ class AddFoodActivity : AppCompatActivity() {
                 this, arrayOf(Manifest.permission.CAMERA), MY_PERMISSIONS_REQUEST_CAMERA
             )
         } else {
-            addFoodTypeViewModel.imageUri = ImageUtils.takePictureFromCamera(this)
+            addFoodViewModel.imageUri = ImageUtils.takePictureFromCamera(this)
         }
 
 
     }
 
-    fun takeExistentPicture(viewModel: AddFoodTypeViewModel) {
-        addFoodTypeViewModel = viewModel
+    fun takeExistentPicture(viewModel: AddFoodViewModel) {
+        addFoodViewModel = viewModel
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         intent.setType("image/*")
         val mimeTypes = arrayOf("image/jpeg", "image/png")
@@ -74,15 +68,15 @@ class AddFoodActivity : AppCompatActivity() {
                 REQUEST_CAPTURE_IMAGE -> {
                     val bitmap = MediaStore.Images.Media.getBitmap(
                         contentResolver,
-                        addFoodTypeViewModel.imageUri
+                        addFoodViewModel.imageUri
                     )
                     val rotatedBitmap = rotateBitmap(
                         bitmap,
                         getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() +
                                 "/TakenFromCamera.jpg"
                     )
-                    addFoodTypeViewModel.updateProfileBitmap(rotatedBitmap)
-                    addFoodTypeViewModel.bottomSheetState.value =
+                    addFoodViewModel.updateProfileBitmap(rotatedBitmap)
+                    addFoodViewModel.bottomSheetState.value =
                         BottomSheetState(initialValue = BottomSheetValue.Collapsed)
 
                 }
@@ -98,8 +92,8 @@ class AddFoodActivity : AppCompatActivity() {
                                 )
                             }
                         }
-                    addFoodTypeViewModel.updateProfileBitmap(rotatedBitmap ?: bitmap)
-                    addFoodTypeViewModel.bottomSheetState.value =
+                    addFoodViewModel.updateProfileBitmap(rotatedBitmap ?: bitmap)
+                    addFoodViewModel.bottomSheetState.value =
                         BottomSheetState(initialValue = BottomSheetValue.Collapsed)
                 }
 
@@ -119,7 +113,7 @@ class AddFoodActivity : AppCompatActivity() {
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_CAMERA -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    addFoodTypeViewModel.imageUri = ImageUtils.takePictureFromCamera(this)
+                    addFoodViewModel.imageUri = ImageUtils.takePictureFromCamera(this)
                 }
             }
         }

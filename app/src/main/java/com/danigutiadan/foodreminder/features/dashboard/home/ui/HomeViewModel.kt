@@ -6,6 +6,7 @@ import com.danigutiadan.foodreminder.Preferences
 import com.danigutiadan.foodreminder.features.dashboard.home.domain.usecases.GetAllFoodUseCase
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.usecases.LogoutUseCase
 import com.danigutiadan.foodreminder.features.food_detail.data.Food
+import com.danigutiadan.foodreminder.features.food_detail.data.FoodWithFoodType
 import com.danigutiadan.foodreminder.features.food_type.domain.usecases.InsertFoodTypeUseCase
 import com.danigutiadan.foodreminder.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,13 +24,13 @@ class HomeViewModel @Inject constructor(
     private val _logoutState = MutableStateFlow<Response<Void>>(Response.Loading)
     val logoutState: StateFlow<Response<Void>> = _logoutState
 
-    private val _getAllFoodState = MutableStateFlow<List<Food>>(mutableListOf())
-    val getAllFoodState: StateFlow<List<Food>> = _getAllFoodState
+    private val _foodListState = MutableStateFlow<List<FoodWithFoodType>>(mutableListOf())
+    val foodListState: StateFlow<List<FoodWithFoodType>> = _foodListState
 
     fun getAllFood() {
         getAllFoodUseCase.execute()
-            .onStart { _getAllFoodState.value = mutableListOf() }
-            .onEach { _getAllFoodState.value = it }
+            .onStart { _foodListState.value = mutableListOf() }
+            .onEach { _foodListState.value = it }
             .launchIn(viewModelScope)
     }
 
@@ -39,5 +40,13 @@ class HomeViewModel @Inject constructor(
             .onEach { _logoutState.value = it }
             .launchIn(viewModelScope)
     }
+
+    fun deleteFoodFromList(it: FoodWithFoodType) {
+        val mutableList: MutableList<FoodWithFoodType> = _foodListState.value.toMutableList()
+        mutableList.remove(it)
+        _foodListState.value = mutableList
+    }
+
+
 
 }

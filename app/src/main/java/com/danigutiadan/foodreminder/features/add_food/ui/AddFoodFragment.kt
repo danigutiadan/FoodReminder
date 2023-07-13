@@ -9,10 +9,11 @@ import android.view.ViewGroup
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.danigutiadan.foodreminder.BaseFragment
 import com.danigutiadan.foodreminder.features.add_food.ui.screens.AddFoodScreen
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
+import com.danigutiadan.foodreminder.utils.ImageUtils.imageUrlToBitmap
 import com.danigutiadan.foodreminder.utils.Response
 import com.google.zxing.integration.android.IntentIntegrator
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,8 +22,8 @@ import java.util.Date
 
 
 @AndroidEntryPoint
-class AddFoodFragment : Fragment() {
-    private val viewModel: AddFoodTypeViewModel by viewModels()
+class AddFoodFragment : BaseFragment() {
+    private val viewModel: AddFoodViewModel by viewModels()
     private val doClosePictureDialog = MutableStateFlow(false)
 
 
@@ -36,23 +37,31 @@ class AddFoodFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 val foodTypeState: Response<List<FoodType>> by viewModel.foodTypeList.collectAsState()
-                val profileBitmap: Bitmap? by viewModel.foodBitmap.collectAsState()
+                val foodBitmap: Bitmap? by viewModel.foodBitmap.collectAsState()
                 val foodName: String by viewModel.foodName.collectAsState()
                 val foodQuantity: String by viewModel.foodQuantity.collectAsState()
-                val expiryDate: Date? by viewModel.selectedDate.collectAsState()
+                val expiryDate: Date? by viewModel.expiryDate.collectAsState()
                 val daysBeforeExpiration: String by viewModel.daysBeforeExpiration.collectAsState()
                 val imageUrl: String by viewModel.foodImageUrl.collectAsState()
+                val isNameError: Boolean by viewModel.isNameError.collectAsState()
+                val isQuantityError: Boolean by viewModel.isQuantityError.collectAsState()
+                val isFoodTypeError: Boolean by viewModel.isFoodTypeError.collectAsState()
+                val isExpiryDateError: Boolean by viewModel.isExpiryDateError.collectAsState()
+                val isDaysBeforeExpirationError: Boolean by viewModel.isDaysBeforeExpirationError.collectAsState()
                 AddFoodScreen(
                     backClickListener = { activity?.onBackPressed() },
                     barcodeClickListener = {
                         initiateScan()
                     },
-                    saveFoodListener = {},
+                    saveFoodListener = {
+                        if(viewModel.allFieldsFilled())
+                        manageFoodImage(imageUrl)
+                    },
                     onExpiryDateSelected = {
                         viewModel.onExpiryDateSelected(it)
                     },
                     foodTypeListState = foodTypeState,
-                    foodBitmap = profileBitmap,
+                    foodBitmap = foodBitmap,
                     bottomSheetPictureDialogState = viewModel.bottomSheetState.collectAsState().value,
                     closePictureDialog = doClosePictureDialog.collectAsState().value,
                     doCloseDialog = {
@@ -95,12 +104,26 @@ class AddFoodFragment : Fragment() {
                         viewModel.onDaysBeforeExpirationMinusPressed()
 
                     },
-                    imageUrl = imageUrl
+                    imageUrl = imageUrl,
+                    isNameError = isNameError,
+                    isQuantityError = isQuantityError,
+                    isFoodTypeError = isFoodTypeError,
+                    isExpiryDateError = isExpiryDateError,
+                    isDaysBeforeExpirationError = isDaysBeforeExpirationError,
                 )
             }
         }
 
 
+    }
+
+    private fun manageFoodImage(imageUrl: String) {
+        if(imageUrl.isNotBlank()) {
+            imageUrlToBitmap(requireContext(), imageUrl) {
+                viewModel.updateFoodImage(it)
+                viewModel.saveFood()
+            }
+        }
     }
 
     private fun initiateScan() {

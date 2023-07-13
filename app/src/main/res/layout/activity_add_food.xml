@@ -10,7 +10,6 @@
         android:id="@+id/addFoodFragment"
         android:name="com.danigutiadan.foodreminder.features.add_food.ui.AddFoodFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:defaultNavHost="true" />
+        android:layout_height="match_parent" />
 
 </RelativeLayout>

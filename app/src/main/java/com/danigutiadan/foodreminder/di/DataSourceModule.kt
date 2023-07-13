@@ -1,7 +1,9 @@
 package com.danigutiadan.foodreminder.di
 
 import com.danigutiadan.foodreminder.Preferences
+import com.danigutiadan.foodreminder.api.ApiService
 import com.danigutiadan.foodreminder.database.FoodReminderDatabase
+import com.danigutiadan.foodreminder.features.add_food.data.datasource.AddFoodDataSource
 import com.danigutiadan.foodreminder.features.dashboard.home.data.datasource.HomeDataSource
 import com.danigutiadan.foodreminder.features.dashboard.home.data.datasource.HomeDataSourceImpl
 import com.danigutiadan.foodreminder.features.dashboard.profile.data.datasource.ProfileDataSource
@@ -31,19 +33,36 @@ object DataSourceModule {
     //DATASOURCES---------------------------
     @Singleton
     @Provides
-    fun provideAuthDataSource(auth: FirebaseAuth, db: FirebaseFirestore, preferences: Preferences) : AuthDataSource = AuthDataSourceImpl(auth, db, preferences)
+    fun provideAuthDataSource(
+        auth: FirebaseAuth,
+        db: FirebaseFirestore,
+        preferences: Preferences
+    ): AuthDataSource = AuthDataSourceImpl(auth, db, preferences)
 
     @Singleton
     @Provides
-    fun provideAddUserInfoDataSource(db: FirebaseFirestore, storage: FirebaseStorage, preferences: Preferences): AddUserInfoDataSource = AddUserInfoDataSourceImpl(db, storage, preferences)
+    fun provideAddUserInfoDataSource(
+        db: FirebaseFirestore,
+        storage: FirebaseStorage,
+        preferences: Preferences
+    ): AddUserInfoDataSource = AddUserInfoDataSourceImpl(db, storage, preferences)
 
     @Singleton
     @Provides
-    fun provideHomeDataSource(auth: FirebaseAuth, preferences: Preferences, placesClient: PlacesClient, db: FoodReminderDatabase): HomeDataSource = HomeDataSourceImpl(auth = auth, preferences = preferences, placesClient = placesClient, db = db)
+    fun provideHomeDataSource(
+        auth: FirebaseAuth,
+        preferences: Preferences,
+        db: FoodReminderDatabase
+    ): HomeDataSource = HomeDataSourceImpl(
+        auth = auth,
+        preferences = preferences,
+        db = db
+    )
 
     @Singleton
     @Provides
-    fun provideProfileDataSource(auth: FirebaseAuth, preferences: Preferences): ProfileDataSource = ProfileDataSourceImpl(auth = auth, preferences = preferences)
+    fun provideProfileDataSource(auth: FirebaseAuth, preferences: Preferences): ProfileDataSource =
+        ProfileDataSourceImpl(auth = auth, preferences = preferences)
 
     @Singleton
     @Provides
@@ -51,5 +70,6 @@ object DataSourceModule {
 
     @Singleton
     @Provides
-    fun provideFoodTypeDataSource(db: FoodReminderDatabase): FoodTypeDataSource = FoodTypeDataSourceImpl(db)
+    fun provideFoodTypeDataSource(db: FoodReminderDatabase): FoodTypeDataSource =
+        FoodTypeDataSourceImpl(db)
 }
