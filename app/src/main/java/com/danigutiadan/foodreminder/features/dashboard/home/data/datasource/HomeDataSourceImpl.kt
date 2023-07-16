@@ -1,14 +1,10 @@
 package com.danigutiadan.foodreminder.features.dashboard.home.data.datasource
 
-import android.util.Log
 import com.danigutiadan.foodreminder.Preferences
 import com.danigutiadan.foodreminder.database.FoodReminderDatabase
-import com.danigutiadan.foodreminder.features.food_detail.data.Food
-import com.danigutiadan.foodreminder.features.food_detail.data.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.Food
+import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
 import com.danigutiadan.foodreminder.utils.Response
-import com.google.android.libraries.places.api.model.TypeFilter
-import com.google.android.libraries.places.api.net.FindAutocompletePredictionsRequest
-import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
@@ -38,10 +34,7 @@ class HomeDataSourceImpl @Inject constructor(
         awaitClose()
     }
 
-    override fun getAllFood(): Flow<List<FoodWithFoodType>> = flow {
-        val response = db.foodHomeDao().getFoodWithFoodType()
-        emit(response)
-    }.flowOn(Dispatchers.IO)
+
 
 
 }

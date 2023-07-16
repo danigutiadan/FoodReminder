@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import com.danigutiadan.foodreminder.BaseFragment
 import com.danigutiadan.foodreminder.features.dashboard.home.ui.screens.HomeScreen
-import com.danigutiadan.foodreminder.features.food_detail.data.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -30,7 +30,9 @@ class HomeFragment : BaseFragment() {
                         // findNavController().navigate(HomeFragmentDirections.actionDashboardNavigationHomeToAddFoodFragment())
                         navigator.navigateToAddFood(activity, false)
                     }, foodList,
-                    onEditButtonPressed = {},
+                    onEditButtonPressed = {
+                        navigator.navigateToEditFood(activity, it.food.id ?: 0, false)
+                    },
                     onDeleteButtonPressed = {
                         homeViewModel.deleteFoodFromList(it)
                     }

@@ -1,4 +1,4 @@
-package com.danigutiadan.foodreminder.features.add_food.domain.models
+package com.danigutiadan.foodreminder.features.food.data.model
 
 import com.google.gson.annotations.SerializedName
 import java.io.Serializable

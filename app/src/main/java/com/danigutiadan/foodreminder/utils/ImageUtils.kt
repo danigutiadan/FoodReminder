@@ -12,7 +12,6 @@ import android.media.ExifInterface
 import android.net.Uri
 import android.os.Environment
 import android.provider.MediaStore
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.SimpleTarget
@@ -20,6 +19,8 @@ import com.bumptech.glide.request.transition.Transition
 import com.danigutiadan.foodreminder.features.onboarding.ui.REQUEST_CAPTURE_IMAGE
 import java.io.ByteArrayOutputStream
 import java.io.File
+import java.io.FileOutputStream
+import java.util.Date
 
 
 object ImageUtils {
@@ -47,12 +48,45 @@ object ImageUtils {
 
     fun bitmapToByteArray(bitmap: Bitmap?): ByteArray? {
         if (bitmap != null) {
-            val stream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            return stream.toByteArray()
+            val MAX_IMAGE_SIZE = 1024 * 1024 // 1MB
+            val outputStream = ByteArrayOutputStream()
+            var compressionQuality = 90 // Rango de calidad de compresión (0-100)
+            var imageSize = 0
+
+            do {
+                outputStream.reset()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, compressionQuality, outputStream)
+                imageSize = outputStream.size()
+
+                // Reducir la calidad de la compresión si el tamaño de la imagen aún es demasiado grande
+                compressionQuality -= 10
+            } while (imageSize > MAX_IMAGE_SIZE && compressionQuality >= 10)
+
+            return outputStream.toByteArray()
         }
         return null
     }
+
+    private fun createDirectoryAndSaveImage(imageToSave: Bitmap, fileName: String) {
+        val direct = File(Environment.getExternalStorageDirectory().toString() + "/FoodReminder")
+        if (!direct.exists()) {
+            val wallpaperDirectory = File("/sdcard/FoodReminder/")
+            wallpaperDirectory.mkdirs()
+        }
+        val file = File("/sdcard/FoodReminder/", fileName)
+        if (file.exists()) {
+            file.delete()
+        }
+        try {
+            val out = FileOutputStream(file)
+            imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            out.flush()
+            out.close()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
 
     fun imageUrlToBitmap(context: Context, imageUrl: String, callback: (Bitmap?) -> Unit) {
         Glide.with(context)

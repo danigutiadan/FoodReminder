@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.TopAppBar
@@ -41,8 +43,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.danigutiadan.foodreminder.features.add_food.ui.screens.AddFoodNameTextField
 import com.danigutiadan.foodreminder.features.dashboard.home.ui.components.FoodItem
-import com.danigutiadan.foodreminder.features.food_detail.data.Food
-import com.danigutiadan.foodreminder.features.food_detail.data.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.Food
+import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
 import java.util.Date
 
@@ -133,38 +135,42 @@ fun HomeScreen(
                 ButtonsBar()
                 Spacer(modifier = Modifier.height(5.dp))
 
-                LazyColumn(modifier = Modifier.background(Color(0xFFECECEC)), content = {
-                    items(foodList.count(), key = { it }) {
-                        FoodItem(
-                            food = foodList[it],
-                            onEditButtonPressed = onEditButtonPressed,
-                            onDeleteButtonPressed = onDeleteButtonPressed,
-                            modifier = Modifier.animateItemPlacement()
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .animateItemPlacement()
-                                .height(10.dp)
-                                .fillMaxWidth()
-                        )
-                    }
-
-                })
-
-//                Column(Modifier.background(Color(0xFFECECEC))) {
-//                    foodList.forEach {
+//                LazyColumn(modifier = Modifier.background(Color(0xFFECECEC)), content = {
+//                    items(foodList.count(), key = { it }) {
 //                        FoodItem(
-//                            food = it,
+//                            food = foodList[it],
 //                            onEditButtonPressed = onEditButtonPressed,
-//                            onDeleteButtonPressed = onDeleteButtonPressed
+//                            onDeleteButtonPressed = onDeleteButtonPressed,
+//                            modifier = Modifier.animateItemPlacement()
 //                        )
 //                        Spacer(
 //                            modifier = Modifier
+//                                .animateItemPlacement()
 //                                .height(10.dp)
 //                                .fillMaxWidth()
 //                        )
 //                    }
-//                }
+//
+//                })
+
+                Column(
+                    Modifier
+                        .background(Color(0xFFECECEC))
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    foodList.forEach {
+                        FoodItem(
+                            food = it,
+                            onEditButtonPressed = onEditButtonPressed,
+                            onDeleteButtonPressed = onDeleteButtonPressed
+                        )
+                        Spacer(
+                            modifier = Modifier
+                                .height(10.dp)
+                                .fillMaxWidth()
+                        )
+                    }
+                }
             }
         })
 }
@@ -289,12 +295,12 @@ fun ButtonsBar() {
 fun PreviewHomeScreen() {
     HomeScreen(
         {}, foodList = listOf(
-            FoodWithFoodType(Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            FoodWithFoodType(Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            FoodWithFoodType(Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            FoodWithFoodType(Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            FoodWithFoodType(Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            FoodWithFoodType(Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
         ),
         {},
         {}

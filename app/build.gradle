@@ -115,7 +115,7 @@ dependencies {
 
     implementation "io.github.dokar3:sheets:0.4.2"
 
-    implementation "io.coil-kt:coil-compose:2.2.1"
+    implementation "io.coil-kt:coil-compose:2.4.0"
 
     //Gson
     implementation 'com.google.code.gson:gson:2.9.0'

@@ -1,6 +1,13 @@
 package com.danigutiadan.foodreminder.utils
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import androidx.room.TypeConverter
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.SimpleTarget
+import com.bumptech.glide.request.transition.Transition
+import java.io.ByteArrayOutputStream
 import java.util.Date
 
 class Converters {
@@ -14,6 +21,35 @@ class Converters {
         return date?.time
     }
 
+    @TypeConverter
+    fun byteArrayToBitmap(byteArray: ByteArray?): Bitmap? {
+        if (byteArray != null) {
+            return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+        }
+        return null
+    }
+
+    @TypeConverter
+    fun bitmapToByteArray(bitmap: Bitmap?): ByteArray? {
+        if (bitmap != null) {
+            val MAX_IMAGE_SIZE = 480 * 640 // 1MB
+            val outputStream = ByteArrayOutputStream()
+            var compressionQuality = 20 // Rango de calidad de compresión (0-100)
+            var imageSize = 0
+
+            do {
+                outputStream.reset()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, compressionQuality, outputStream)
+                imageSize = outputStream.size()
+
+                // Reducir la calidad de la compresión si el tamaño de la imagen aún es demasiado grande
+                compressionQuality -= 10
+            } while (imageSize > MAX_IMAGE_SIZE && compressionQuality >= 10)
+
+            return outputStream.toByteArray()
+        }
+        return null
+    }
 
 
 //    fun intToFoodStatus(value: Int): FoodStatus {

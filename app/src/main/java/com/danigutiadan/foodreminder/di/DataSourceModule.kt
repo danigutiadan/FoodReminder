@@ -1,9 +1,7 @@
 package com.danigutiadan.foodreminder.di
 
 import com.danigutiadan.foodreminder.Preferences
-import com.danigutiadan.foodreminder.api.ApiService
 import com.danigutiadan.foodreminder.database.FoodReminderDatabase
-import com.danigutiadan.foodreminder.features.add_food.data.datasource.AddFoodDataSource
 import com.danigutiadan.foodreminder.features.dashboard.home.data.datasource.HomeDataSource
 import com.danigutiadan.foodreminder.features.dashboard.home.data.datasource.HomeDataSourceImpl
 import com.danigutiadan.foodreminder.features.dashboard.profile.data.datasource.ProfileDataSource
@@ -16,7 +14,6 @@ import com.danigutiadan.foodreminder.features.onboarding.data.datasource.AuthDat
 import com.danigutiadan.foodreminder.features.onboarding.data.datasource.AuthDataSourceImpl
 import com.danigutiadan.foodreminder.features.onboarding.signin.data.datasource.UserDataSource
 import com.danigutiadan.foodreminder.features.onboarding.signin.data.datasource.UserDataSourceImpl
-import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage

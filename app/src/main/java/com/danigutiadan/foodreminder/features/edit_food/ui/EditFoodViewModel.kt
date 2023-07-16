@@ -1,14 +1,12 @@
-package com.danigutiadan.foodreminder.features.add_food.ui
+package com.danigutiadan.foodreminder.features.edit_food.ui
 
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.danigutiadan.foodreminder.features.food.data.model.BarcodeFoodResponse
-import com.danigutiadan.foodreminder.features.food.domain.usecase.GetFoodInfoByBarcodeUseCase
-import com.danigutiadan.foodreminder.features.food.domain.usecase.SaveFoodUseCase
+import com.danigutiadan.foodreminder.features.food.domain.usecase.GetFoodByIdUseCase
+import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
-import com.danigutiadan.foodreminder.features.food_type.domain.usecases.GetAllFoodTypesUseCase
 import com.danigutiadan.foodreminder.utils.Response
 import com.dokar.sheets.BottomSheetState
 import com.dokar.sheets.BottomSheetValue
@@ -18,19 +16,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.launch
 import java.util.Date
 import javax.inject.Inject
 
-
 @HiltViewModel
-class AddFoodViewModel @Inject constructor(
-    private val getAllFoodTypesUseCase: GetAllFoodTypesUseCase,
-    private val getFoodInfoByBarcode: GetFoodInfoByBarcodeUseCase,
-    private val saveFoodUseCase: SaveFoodUseCase
-) : ViewModel() {
+class EditFoodViewModel @Inject constructor(private val getFoodByIdUseCase: GetFoodByIdUseCase) : ViewModel() {
 
-
+    private val _food = MutableStateFlow<Response<FoodWithFoodType>?>(null)
+    val food: StateFlow<Response<FoodWithFoodType>?> = _food
     private val _isDaysBeforeExpirationError = MutableStateFlow(false)
     var isDaysBeforeExpirationError: StateFlow<Boolean> = _isDaysBeforeExpirationError
 
@@ -40,6 +33,7 @@ class AddFoodViewModel @Inject constructor(
     private val _isFoodTypeError = MutableStateFlow(false)
     var isFoodTypeError: StateFlow<Boolean> = _isFoodTypeError
 
+    var imageUri: Uri? = null
 
     private val _isQuantityError = MutableStateFlow(false)
     var isQuantityError: StateFlow<Boolean> = _isQuantityError
@@ -48,7 +42,6 @@ class AddFoodViewModel @Inject constructor(
     var isNameError: StateFlow<Boolean> = _isNameError
 
     val bottomSheetState = MutableStateFlow(BottomSheetState(BottomSheetValue.Collapsed))
-    var imageUri: Uri? = null
 
     private val _foodBitmap = MutableStateFlow<Bitmap?>(null)
     val foodBitmap: StateFlow<Bitmap?> = _foodBitmap
@@ -71,23 +64,8 @@ class AddFoodViewModel @Inject constructor(
     private val _daysBeforeExpiration = MutableStateFlow("0")
     val daysBeforeExpiration: StateFlow<String> = _daysBeforeExpiration
 
-    private val _foodImageUrl = MutableStateFlow("")
-    val foodImageUrl: StateFlow<String> = _foodImageUrl
-
-    private val _foodTypeByBarcodeState =
-        MutableStateFlow<Response<BarcodeFoodResponse?>>(Response.Loading)
-    val foodTypeByBarcodeState: StateFlow<Response<BarcodeFoodResponse?>> = _foodTypeByBarcodeState
-
-    fun getAllFoodTypes() {
-        getAllFoodTypesUseCase.execute()
-            .onEach { _foodTypeList.value = Response.Loading }
-            .onEach { _foodTypeList.value = it }
-            .launchIn(viewModelScope)
-    }
-
     fun updateProfileBitmap(bitmap: Bitmap) {
         _foodBitmap.value = bitmap
-        _foodImageUrl.value = ""
     }
 
     fun onFoodQuantityChanged(quantity: String) {
@@ -105,24 +83,6 @@ class AddFoodViewModel @Inject constructor(
     fun onExpiryDateSelected(date: Date) {
         _expiryDate.value = date
     }
-
-    fun onFoodBarcodeScanned(barcode: String) {
-        viewModelScope.launch {
-            _foodTypeByBarcodeState.value = Response.Loading
-            getFoodInfoByBarcode.execute(barcode)
-                .collect { response ->
-                    _foodTypeByBarcodeState.value = response
-
-                    if (response is Response.Success) {
-                        if (response.data?.products?.isNotEmpty() == true) {
-                            _foodName.value = response.data?.products?.first()?.name.toString()
-                            _foodImageUrl.value = response.data?.products?.first()?.imageUrl ?: ""
-                        }
-                    }
-                }
-        }
-    }
-
 
     fun onDaysBeforeExpiration(daysBeforeExpired: String) {
         _daysBeforeExpiration.value = daysBeforeExpired
@@ -149,21 +109,6 @@ class AddFoodViewModel @Inject constructor(
 
     }
 
-    fun saveFood() {
-        saveFoodUseCase.execute(
-            name = _foodName.value,
-            quantity = _foodQuantity.value.toInt(),
-            foodType = _foodType.value?.id!!,
-            expiryDate = _expiryDate.value!!,
-            daysBeforeExpiration = _daysBeforeExpiration.value.toInt(),
-            foodBitmap = _foodBitmap.value
-        )
-            .onStart { }
-            .onEach {
-            }.launchIn(viewModelScope)
-
-    }
-
     fun allFieldsFilled(): Boolean {
         _isNameError.value = _foodName.value.isBlank()
         _isQuantityError.value = _foodQuantity.value.toInt() < 1
@@ -177,10 +122,30 @@ class AddFoodViewModel @Inject constructor(
             .and(_daysBeforeExpiration.value.toInt() >= 1)
     }
 
-    fun updateFoodImage(bitmap: Bitmap?) {
-        if (bitmap != null) {
-            _foodBitmap.value = bitmap
-        }
+    fun getFoodById(id: Int) {
+            getFoodByIdUseCase.execute(id)
+                .onStart { _food.value = Response.Loading }
+                .onEach {
+                    _food.value = Response.Success(it) }
+                .launchIn(viewModelScope)
     }
 
+    fun saveFood() {
+        if (allFieldsFilled()) {
+//            saveFoodUseCase.execute(
+//                name = _foodName.value,
+//                quantity = _foodQuantity.value.toInt(),
+//                foodType = _foodType.value?.id!!,
+//                expiryDate = _expiryDate.value!!,
+//                daysBeforeExpiration = _daysBeforeExpiration.value.toInt(),
+//                foodBitmap = _foodBitmap.value
+//            )
+//                .onStart { }
+//                .onEach {
+//                }.launchIn(viewModelScope)
+//        }
+//    }
+
+        }
+    }
 }

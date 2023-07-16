@@ -1,12 +1,14 @@
 package com.danigutiadan.foodreminder.di
 
-import com.danigutiadan.foodreminder.features.add_food.domain.repository.AddFoodRepository
-import com.danigutiadan.foodreminder.features.add_food.domain.usecases.GetFoodInfoByBarcodeUseCase
-import com.danigutiadan.foodreminder.features.add_food.domain.usecases.SaveFoodUseCase
+import com.danigutiadan.foodreminder.features.food.domain.usecase.GetFoodInfoByBarcodeUseCase
+import com.danigutiadan.foodreminder.features.food.domain.usecase.SaveFoodUseCase
 import com.danigutiadan.foodreminder.features.dashboard.home.domain.repository.HomeRepository
-import com.danigutiadan.foodreminder.features.dashboard.home.domain.usecases.GetAllFoodUseCase
+import com.danigutiadan.foodreminder.features.food.domain.usecase.GetAllFoodUseCase
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.repository.ProfileRepository
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.usecases.LogoutUseCase
+import com.danigutiadan.foodreminder.features.food.domain.usecase.GetFoodByIdUseCase
+import com.danigutiadan.foodreminder.features.food.domain.FoodRepository
+import com.danigutiadan.foodreminder.features.food.domain.usecase.DeleteFoodUseCase
 import com.danigutiadan.foodreminder.features.food_type.domain.repository.FoodTypeRepository
 import com.danigutiadan.foodreminder.features.food_type.domain.usecases.GetAllFoodTypesUseCase
 import com.danigutiadan.foodreminder.features.food_type.domain.usecases.InsertFoodTypeUseCase
@@ -55,8 +57,8 @@ object UseCaseModule {
 
     @Singleton
     @Provides
-    fun provideGetAllFoodUseCase(homeRepository: HomeRepository) =
-        GetAllFoodUseCase(homeRepository = homeRepository)
+    fun provideGetAllFoodUseCase(foodRepository: FoodRepository) =
+        GetAllFoodUseCase(foodRepository = foodRepository)
 
     @Singleton
     @Provides
@@ -70,13 +72,23 @@ object UseCaseModule {
 
     @Singleton
     @Provides
-    fun provideGetFoodInfoByBarcodeUseCase(addFoodRepository: AddFoodRepository) =
-        GetFoodInfoByBarcodeUseCase(addFoodRepository = addFoodRepository)
+    fun provideGetFoodInfoByBarcodeUseCase(foodRepository: FoodRepository) =
+        GetFoodInfoByBarcodeUseCase(foodRepository = foodRepository)
 
     @Singleton
     @Provides
-    fun provideSaveFoodUseCase(addFoodRepository: AddFoodRepository) =
-        SaveFoodUseCase(addFoodRepository = addFoodRepository)
+    fun provideSaveFoodUseCase(foodRepository: FoodRepository) =
+        SaveFoodUseCase(foodRepository = foodRepository)
+
+    @Singleton
+    @Provides
+    fun provideGetFoodByIdUseCase(foodRepository: FoodRepository) =
+        GetFoodByIdUseCase(foodRepository = foodRepository)
+
+    @Singleton
+    @Provides
+    fun provideDeleteFoodUseCase(foodRepository: FoodRepository) =
+        DeleteFoodUseCase(foodRepository = foodRepository)
 
 
 }

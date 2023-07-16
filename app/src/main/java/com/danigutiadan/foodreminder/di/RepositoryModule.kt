@@ -1,13 +1,13 @@
 package com.danigutiadan.foodreminder.di
 
-import com.danigutiadan.foodreminder.features.add_food.data.datasource.AddFoodDataSource
-import com.danigutiadan.foodreminder.features.add_food.data.repository.AddFoodRepositoryImpl
-import com.danigutiadan.foodreminder.features.add_food.domain.repository.AddFoodRepository
+import com.danigutiadan.foodreminder.features.food.data.FoodDataSource
 import com.danigutiadan.foodreminder.features.dashboard.home.data.datasource.HomeDataSource
 import com.danigutiadan.foodreminder.features.dashboard.home.data.repository.HomeRepositoryImpl
 import com.danigutiadan.foodreminder.features.dashboard.home.domain.repository.HomeRepository
 import com.danigutiadan.foodreminder.features.dashboard.profile.data.repository.ProfileRepositoryImpl
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.repository.ProfileRepository
+import com.danigutiadan.foodreminder.features.food.data.FoodRepositoryImpl
+import com.danigutiadan.foodreminder.features.food.domain.FoodRepository
 import com.danigutiadan.foodreminder.features.food_type.data.datasource.FoodTypeDataSource
 import com.danigutiadan.foodreminder.features.food_type.data.repository.FoodTypeRepositoryImpl
 import com.danigutiadan.foodreminder.features.food_type.domain.repository.FoodTypeRepository
@@ -70,7 +70,7 @@ object RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideAddFoodRepository(addFoodTypeDataSource: AddFoodDataSource): AddFoodRepository =
-        AddFoodRepositoryImpl(addFoodTypeDataSource)
+    fun provideFoodRepository(foodDataSource: FoodDataSource): FoodRepository =
+        FoodRepositoryImpl(foodDataSource)
 
 }

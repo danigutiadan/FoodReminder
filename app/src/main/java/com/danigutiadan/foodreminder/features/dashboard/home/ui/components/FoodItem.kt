@@ -23,10 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -35,14 +32,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.danigutiadan.foodreminder.R
-import com.danigutiadan.foodreminder.features.food_detail.data.Food
-import com.danigutiadan.foodreminder.features.food_detail.data.FoodStatus
-import com.danigutiadan.foodreminder.features.food_detail.data.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.Food
+import com.danigutiadan.foodreminder.features.food.data.model.FoodStatus
+import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.foodreminder.utils.DateUtils.formatDateToString
 import com.danigutiadan.foodreminder.utils.ImageUtils
-import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 import java.util.Date
 
 @Composable
@@ -66,8 +61,8 @@ fun FoodItem(
                 )
             )
         ) {
-            val painter = if (ImageUtils.byteArrayToBitmap(food.food.image) != null)
-                rememberAsyncImagePainter(ImageUtils.byteArrayToBitmap(food.food.image))
+            val painter = if (food.food.image != null)
+                rememberAsyncImagePainter(food.food.image)
             else
                 painterResource(id = R.drawable.add_food_placeholder)
             Image(
@@ -122,7 +117,7 @@ fun FoodItem(
                         .padding(bottom = 10.dp)
                 ) {
 
-                    IconButton(onClick = { /*TODO*/ }, modifier = Modifier.size(24.dp)) {
+                    IconButton(onClick = { onEditButtonPressed(food) }, modifier = Modifier.size(24.dp)) {
                         Icon(
                             imageVector = Icons.Filled.Edit,
                             contentDescription = "",
@@ -165,7 +160,7 @@ private fun getItemBackgroundColor(foodState: FoodStatus): Color {
 @Composable
 fun PreviewActivityItem() {
     FoodItem(
-        food = FoodWithFoodType(Food(6, "Pollo", 1, Date(), 1, 1), FoodType(1, "Hola")),
+        food = FoodWithFoodType(1, Food(6, "Pollo", 1, Date(), 1, 1), FoodType(1, "Hola")),
         {},
         {})
 }

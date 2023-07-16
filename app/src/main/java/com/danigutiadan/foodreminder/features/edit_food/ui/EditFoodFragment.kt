@@ -1,7 +1,5 @@
-package com.danigutiadan.foodreminder.features.add_food.ui
+package com.danigutiadan.foodreminder.features.edit_food.ui
 
-import android.annotation.SuppressLint
-import android.content.Intent
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,30 +10,24 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import com.danigutiadan.foodreminder.BaseFragment
-import com.danigutiadan.foodreminder.features.add_food.ui.screens.AddFoodScreen
+import com.danigutiadan.foodreminder.features.edit_food.ui.screens.EditFoodScreen
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
-import com.danigutiadan.foodreminder.utils.ImageUtils.imageUrlToBitmap
 import com.danigutiadan.foodreminder.utils.Response
-import com.google.zxing.integration.android.IntentIntegrator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.util.Date
 
-
 @AndroidEntryPoint
-class AddFoodFragment : BaseFragment() {
-    private val viewModel: AddFoodViewModel by viewModels()
+class EditFoodFragment : BaseFragment() {
+    private val viewModel: EditFoodViewModel by viewModels()
     private val doClosePictureDialog = MutableStateFlow(false)
 
-
-    @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         // Inflate the layout for this fragment
-        viewModel.getAllFoodTypes()
-
+        viewModel.getFoodById((activity as EditFoodActivity).getFoodId())
         return ComposeView(requireContext()).apply {
             setContent {
                 val foodTypeState: Response<List<FoodType>> by viewModel.foodTypeList.collectAsState()
@@ -44,34 +36,22 @@ class AddFoodFragment : BaseFragment() {
                 val foodQuantity: String by viewModel.foodQuantity.collectAsState()
                 val expiryDate: Date? by viewModel.expiryDate.collectAsState()
                 val daysBeforeExpiration: String by viewModel.daysBeforeExpiration.collectAsState()
-                val imageUrl: String by viewModel.foodImageUrl.collectAsState()
                 val isNameError: Boolean by viewModel.isNameError.collectAsState()
                 val isQuantityError: Boolean by viewModel.isQuantityError.collectAsState()
                 val isFoodTypeError: Boolean by viewModel.isFoodTypeError.collectAsState()
                 val isExpiryDateError: Boolean by viewModel.isExpiryDateError.collectAsState()
                 val isDaysBeforeExpirationError: Boolean by viewModel.isDaysBeforeExpirationError.collectAsState()
-                AddFoodScreen(
+                EditFoodScreen(
                     backClickListener = { activity?.onBackPressed() },
-                    barcodeClickListener = {
-                        initiateScan()
-                    },
-                    saveFoodListener = {
-                        if(viewModel.allFieldsFilled())
-                        manageFoodImage(imageUrl)
-                    },
-                    onExpiryDateSelected = {
-                        viewModel.onExpiryDateSelected(it)
-                    },
-                    foodTypeListState = foodTypeState,
+                    saveFoodListener = { viewModel.saveFood() },
+                    onExpiryDateSelected = { viewModel.onExpiryDateSelected(it) },
                     foodBitmap = foodBitmap,
                     bottomSheetPictureDialogState = viewModel.bottomSheetState.collectAsState().value,
                     closePictureDialog = doClosePictureDialog.collectAsState().value,
-                    doCloseDialog = {
-                        doClosePictureDialog.value = false
-                    },
-                    onTakePicture = { (activity as AddFoodActivity).takePicture(viewModel) },
+                    doCloseDialog = { doClosePictureDialog.value = false },
+                    onTakePicture = { (activity as EditFoodActivity).takePicture(viewModel) },
                     onGetExistentPicture = {
-                        (activity as AddFoodActivity).takeExistentPicture(
+                        (activity as EditFoodActivity).takeExistentPicture(
                             viewModel
                         )
                     },
@@ -106,7 +86,6 @@ class AddFoodFragment : BaseFragment() {
                         viewModel.onDaysBeforeExpirationMinusPressed()
 
                     },
-                    imageUrl = imageUrl,
                     isNameError = isNameError,
                     isQuantityError = isQuantityError,
                     isFoodTypeError = isFoodTypeError,
@@ -115,45 +94,5 @@ class AddFoodFragment : BaseFragment() {
                 )
             }
         }
-
-
     }
-
-    private fun manageFoodImage(imageUrl: String) {
-        if(imageUrl.isNotBlank()) {
-            imageUrlToBitmap(requireContext(), imageUrl) {
-                viewModel.updateFoodImage(it)
-                viewModel.saveFood()
-            }
-        } else {
-            viewModel.saveFood()
-        }
-    }
-
-    private fun initiateScan() {
-        // Dentro de tu función onCreate, onCreateView o donde sea apropiado
-        val integrator = IntentIntegrator.forSupportFragment(this)
-        integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
-        integrator.setPrompt("Escanea un código de barras")
-        integrator.setCameraId(0) // Usa la cámara trasera
-        integrator.setBeepEnabled(false) // Desactiva el sonido de escaneo
-        integrator.setOrientationLocked(true) // Permite que la orientación cambie durante el escaneo
-        integrator.initiateScan()
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        when (requestCode) {
-            IntentIntegrator.REQUEST_CODE -> {
-                val result = IntentIntegrator.parseActivityResult(resultCode, data)
-                if (result != null && result.contents != null) {
-                    viewModel.onFoodBarcodeScanned(result.contents)
-                } else {
-                    // El escaneo fue cancelado por el usuario
-                }
-            }
-        }
-    }
-
-
 }
