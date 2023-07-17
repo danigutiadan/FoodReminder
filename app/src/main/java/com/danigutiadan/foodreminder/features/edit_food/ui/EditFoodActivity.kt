@@ -17,11 +17,13 @@ import com.danigutiadan.foodreminder.utils.ImageUtils
 import com.dokar.sheets.BottomSheetState
 import com.dokar.sheets.BottomSheetValue
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Date
 
 @AndroidEntryPoint
 class EditFoodActivity : AppCompatActivity() {
     private lateinit var editFoodViewModel: EditFoodViewModel
     private lateinit var binding: ActivityEditFoodBinding
+    private var currentTimeMillis = ""
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -34,6 +36,7 @@ class EditFoodActivity : AppCompatActivity() {
         intent.getIntExtra("foodId", 0)
 
     fun takePicture(viewModel: EditFoodViewModel) {
+        currentTimeMillis = Date().time.toString()
         editFoodViewModel = viewModel
         if (ContextCompat.checkSelfPermission(
                 this,
@@ -46,7 +49,7 @@ class EditFoodActivity : AppCompatActivity() {
                 this, arrayOf(Manifest.permission.CAMERA), MY_PERMISSIONS_REQUEST_CAMERA
             )
         } else {
-            editFoodViewModel.imageUri = ImageUtils.takePictureFromCamera(this)
+            editFoodViewModel.imageUri = ImageUtils.takePictureFromCamera(this, currentTimeMillis)
         }
 
 
@@ -72,10 +75,10 @@ class EditFoodActivity : AppCompatActivity() {
                         contentResolver,
                         editFoodViewModel.imageUri
                     )
-                    val rotatedBitmap = ImageUtils.rotateBitmap(
+                    val rotatedBitmap = ImageUtils.getRotatedBitmapFromFilePath(
                         bitmap,
                         getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() +
-                                "/TakenFromCamera.jpg"
+                                "/${currentTimeMillis}.jpg"
                     )
                     editFoodViewModel.updateProfileBitmap(rotatedBitmap)
                     editFoodViewModel.bottomSheetState.value =
@@ -88,7 +91,7 @@ class EditFoodActivity : AppCompatActivity() {
                     val rotatedBitmap =
                         data?.data?.let {
                             ImageUtils.getImageFilePath(it, contentResolver)?.let {
-                                ImageUtils.rotateBitmap(
+                                ImageUtils.getRotatedBitmapFromFilePath(
                                     bitmap,
                                     it
                                 )
@@ -115,7 +118,7 @@ class EditFoodActivity : AppCompatActivity() {
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_CAMERA -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    editFoodViewModel.imageUri = ImageUtils.takePictureFromCamera(this)
+                    editFoodViewModel.imageUri = ImageUtils.takePictureFromCamera(this, currentTimeMillis)
                 }
             }
         }

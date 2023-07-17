@@ -49,11 +49,13 @@ import java.util.Date
 const val REQUEST_CODE_IMAGE_PICKER = 100
 const val REQUEST_CAPTURE_IMAGE = 101
 const val MY_PERMISSIONS_REQUEST_CAMERA = 102
+const val READ_EXTERNAL_STORAGE_PERMISSION_CODE = 104
 private val bottomSheetState = MutableStateFlow(BottomSheetState(BottomSheetValue.Collapsed))
 private val doClosePictureDialog = MutableStateFlow(false)
 
 @AndroidEntryPoint
 class OnboardingActivity : BaseActivity() {
+    private var currentTimeMillis = ""
     private var navController: NavHostController? = null
     private val onboardingViewModel: OnboardingViewModel by viewModels()
     private val addUserInfoViewModel: AddUserInfoViewModel by viewModels()
@@ -142,7 +144,8 @@ class OnboardingActivity : BaseActivity() {
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_CAMERA -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    addUserInfoViewModel.imageUri = ImageUtils.takePictureFromCamera(this)
+                    addUserInfoViewModel.imageUri =
+                        ImageUtils.takePictureFromCamera(this, currentTimeMillis)
                 }
             }
         }
@@ -302,6 +305,7 @@ class OnboardingActivity : BaseActivity() {
     }
 
     private fun takePicture(viewModel: AddUserInfoViewModel) {
+        currentTimeMillis = Date().time.toString()
         if (ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.CAMERA
@@ -313,7 +317,7 @@ class OnboardingActivity : BaseActivity() {
                 this, arrayOf(Manifest.permission.CAMERA), MY_PERMISSIONS_REQUEST_CAMERA
             )
         } else {
-            viewModel.imageUri = ImageUtils.takePictureFromCamera(this)
+            viewModel.imageUri = ImageUtils.takePictureFromCamera(this, currentTimeMillis)
         }
 
 

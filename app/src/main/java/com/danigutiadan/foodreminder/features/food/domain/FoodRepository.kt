@@ -1,9 +1,8 @@
 package com.danigutiadan.foodreminder.features.food.domain
 
-import android.graphics.Bitmap
 import com.danigutiadan.foodreminder.features.food.data.model.BarcodeFoodResponse
 import com.danigutiadan.foodreminder.features.food.data.model.Food
-import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.FoodInfo
 import com.danigutiadan.foodreminder.utils.Response
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
@@ -17,11 +16,11 @@ interface FoodRepository {
         foodType: Int,
         expiryDate: Date,
         daysBeforeExpiration: Int,
-        foodBitmap: Bitmap?
+        foodImageUrl: String
     ): Flow<Response<Unit>>
 
 
-    fun getAllFood(): Flow<List<FoodWithFoodType>>
-    fun getFoodById(id: Int): Flow<FoodWithFoodType>
+    fun getAllFood(): Flow<List<FoodInfo>>
+    fun getFoodById(id: Int): Flow<FoodInfo>
     fun deleteFood(food: Food): Flow<Response<Unit>>
 }

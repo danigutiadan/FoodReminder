@@ -5,6 +5,7 @@ import android.content.ContentResolver
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
@@ -20,17 +21,17 @@ import com.danigutiadan.foodreminder.features.onboarding.ui.REQUEST_CAPTURE_IMAG
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.util.Date
+import java.io.IOException
 
 
 object ImageUtils {
 
-    fun takePictureFromCamera(context: Activity): Uri? {
+    fun takePictureFromCamera(context: Activity, fileName: String): Uri? {
 
         // Create a file to save the image
         val file = File(
             context.getExternalFilesDir(Environment.DIRECTORY_PICTURES),
-            "TakenFromCamera.jpg"
+            "${fileName}.jpg"
         )
 
         // Create a Uri for the file
@@ -44,6 +45,20 @@ object ImageUtils {
         intent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
         context.startActivityForResult(intent, REQUEST_CAPTURE_IMAGE)
         return uri
+    }
+
+     fun getAbsolutePathFromUri(uri: Uri?, contentResolver: ContentResolver): String? {
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor: Cursor? = uri?.let { contentResolver.query(it, projection, null, null, null) }
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                return it.getString(columnIndex)
+            }
+        }
+
+        return null
     }
 
     fun bitmapToByteArray(bitmap: Bitmap?): ByteArray? {
@@ -67,24 +82,63 @@ object ImageUtils {
         return null
     }
 
-    private fun createDirectoryAndSaveImage(imageToSave: Bitmap, fileName: String) {
-        val direct = File(Environment.getExternalStorageDirectory().toString() + "/FoodReminder")
-        if (!direct.exists()) {
-            val wallpaperDirectory = File("/sdcard/FoodReminder/")
-            wallpaperDirectory.mkdirs()
-        }
-        val file = File("/sdcard/FoodReminder/", fileName)
-        if (file.exists()) {
-            file.delete()
-        }
+    fun createDirectoryAndSaveImage(context: Context, imageToSave: Bitmap, fileName: String): String? {
+       val fileName = "$fileName.jpg"
+        val storageDir = context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
         try {
-            val out = FileOutputStream(file)
-            imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out)
-            out.flush()
-            out.close()
-        } catch (e: Exception) {
+            val file = File(storageDir, fileName)
+            val outStream = FileOutputStream(file)
+            imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, outStream)
+            outStream.flush()
+            outStream.close()
+            return file.absolutePath
+        } catch (e: IOException) {
             e.printStackTrace()
         }
+
+        return null
+    }
+
+
+//    fun createDirectoryAndSaveImage(imageToSave: Bitmap, fileName: String): String? {
+//        val direct = File(Environment.getExternalStorageDirectory().toString() + "/FoodReminder")
+//        if (!direct.exists()) {
+//            val wallpaperDirectory = File("/sdcard/FoodReminder/")
+//            wallpaperDirectory.mkdirs()
+//        }
+//        val file = File("/sdcard/FoodReminder/", "$fileName.jpg")
+//        if (file.exists()) {
+//            file.delete()
+//        }
+//        try {
+//            val out = FileOutputStream(file)
+//            imageToSave.compress(Bitmap.CompressFormat.JPEG, 100, out)
+//            out.flush()
+//            out.close()
+//            return file.absolutePath
+//        } catch (e: Exception) {
+//            e.printStackTrace()
+//        }
+//         return null
+//     }
+
+    fun getBitmapFromFilePath(contentResolver: ContentResolver, data: Intent?): Bitmap {
+        val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data?.data)
+        val rotatedBitmap =
+            data?.data?.let {
+                getImageFilePath(it, contentResolver)?.let {
+                    getRotatedBitmapFromFilePath(
+                        bitmap,
+                        it
+                    )
+                }
+            }
+        return rotatedBitmap ?: bitmap
+    }
+
+    fun getBitmapFromFilePath(filePath: String): Bitmap? {
+        return BitmapFactory.decodeFile(filePath)
     }
 
 
@@ -109,7 +163,7 @@ object ImageUtils {
 
 
 
-    fun rotateBitmap(bitmap: Bitmap, imagePath: String): Bitmap {
+    fun getRotatedBitmapFromFilePath(bitmap: Bitmap, imagePath: String): Bitmap {
         val exif = ExifInterface(imagePath)
         val orientation =
             exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED)

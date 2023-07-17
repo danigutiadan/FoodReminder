@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import com.danigutiadan.foodreminder.features.food.data.model.Food
-import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.FoodInfo
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,11 +20,11 @@ interface FoodDao {
 
     @Transaction
     @Query("SELECT * FROM food INNER JOIN food_type ON food.food_type_Id = food_type.id")
-    fun getFoodWithFoodType(): List<FoodWithFoodType>
+    fun getFoodWithFoodType(): List<FoodInfo>
 
     @Transaction
     @Query("SELECT * FROM food INNER JOIN food_type ON food.food_type_Id = food_type.id WHERE food.food_id = :foodId")
-    fun getFoodWithFoodTypeById(foodId: Int): FoodWithFoodType?
+    fun getFoodWithFoodTypeById(foodId: Int): FoodInfo?
 
     @Delete
     fun deleteFood(food: Food)

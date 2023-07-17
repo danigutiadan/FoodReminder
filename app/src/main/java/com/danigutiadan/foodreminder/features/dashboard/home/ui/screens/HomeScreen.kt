@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.sp
 import com.danigutiadan.foodreminder.features.add_food.ui.screens.AddFoodNameTextField
 import com.danigutiadan.foodreminder.features.dashboard.home.ui.components.FoodItem
 import com.danigutiadan.foodreminder.features.food.data.model.Food
-import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.FoodInfo
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
 import java.util.Date
 
@@ -52,9 +52,9 @@ import java.util.Date
 @Composable
 fun HomeScreen(
     addFoodButtonListener: () -> Unit,
-    foodList: List<FoodWithFoodType>,
-    onEditButtonPressed: (FoodWithFoodType) -> Unit,
-    onDeleteButtonPressed: (FoodWithFoodType) -> Unit
+    foodList: List<FoodInfo>,
+    onEditButtonPressed: (FoodInfo) -> Unit,
+    onDeleteButtonPressed: (FoodInfo) -> Unit
 ) {
 
 
@@ -153,24 +153,39 @@ fun HomeScreen(
 //
 //                })
 
-                Column(
-                    Modifier
-                        .background(Color(0xFFECECEC))
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    foodList.forEach {
-                        FoodItem(
-                            food = it,
-                            onEditButtonPressed = onEditButtonPressed,
-                            onDeleteButtonPressed = onDeleteButtonPressed
-                        )
-                        Spacer(
-                            modifier = Modifier
-                                .height(10.dp)
-                                .fillMaxWidth()
+                if (foodList.isNotEmpty()) {
+                    Column(
+                        Modifier
+                            .background(Color(0xFFECECEC))
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        foodList.forEach {
+                            FoodItem(
+                                food = it,
+                                onEditButtonPressed = onEditButtonPressed,
+                                onDeleteButtonPressed = onDeleteButtonPressed
+                            )
+                            Spacer(
+                                modifier = Modifier
+                                    .height(10.dp)
+                                    .fillMaxWidth()
+                            )
+                        }
+                    }
+                } else {
+
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        Text(
+                            text = "No tienes ningún alimento en tu lista aún",
+                            modifier = Modifier.align(
+                                Alignment.Center
+                            )
                         )
                     }
+
                 }
+
+
             }
         })
 }
@@ -295,12 +310,12 @@ fun ButtonsBar() {
 fun PreviewHomeScreen() {
     HomeScreen(
         {}, foodList = listOf(
-            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            FoodWithFoodType(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
         ),
         {},
         {}

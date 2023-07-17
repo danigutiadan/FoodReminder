@@ -5,7 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.danigutiadan.foodreminder.features.food.domain.usecase.GetFoodByIdUseCase
-import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.FoodInfo
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.foodreminder.utils.Response
 import com.dokar.sheets.BottomSheetState
@@ -22,8 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class EditFoodViewModel @Inject constructor(private val getFoodByIdUseCase: GetFoodByIdUseCase) : ViewModel() {
 
-    private val _food = MutableStateFlow<Response<FoodWithFoodType>?>(null)
-    val food: StateFlow<Response<FoodWithFoodType>?> = _food
+    private val _food = MutableStateFlow<Response<FoodInfo>?>(null)
+    val food: StateFlow<Response<FoodInfo>?> = _food
     private val _isDaysBeforeExpirationError = MutableStateFlow(false)
     var isDaysBeforeExpirationError: StateFlow<Boolean> = _isDaysBeforeExpirationError
 

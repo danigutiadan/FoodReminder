@@ -11,18 +11,22 @@ import androidx.core.content.ContextCompat
 import com.danigutiadan.foodreminder.BaseActivity
 import com.danigutiadan.foodreminder.databinding.ActivityAddFoodBinding
 import com.danigutiadan.foodreminder.features.onboarding.ui.MY_PERMISSIONS_REQUEST_CAMERA
+import com.danigutiadan.foodreminder.features.onboarding.ui.READ_EXTERNAL_STORAGE_PERMISSION_CODE
 import com.danigutiadan.foodreminder.features.onboarding.ui.REQUEST_CAPTURE_IMAGE
 import com.danigutiadan.foodreminder.features.onboarding.ui.REQUEST_CODE_IMAGE_PICKER
 import com.danigutiadan.foodreminder.utils.ImageUtils
-import com.danigutiadan.foodreminder.utils.ImageUtils.rotateBitmap
+import com.danigutiadan.foodreminder.utils.ImageUtils.getBitmapFromFilePath
+import com.danigutiadan.foodreminder.utils.ImageUtils.getRotatedBitmapFromFilePath
 import com.dokar.sheets.BottomSheetState
 import com.dokar.sheets.BottomSheetValue
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Date
 
 @AndroidEntryPoint
 class AddFoodActivity : BaseActivity() {
     private lateinit var addFoodViewModel: AddFoodViewModel
     private lateinit var binding: ActivityAddFoodBinding
+    private var currentTimeMillis = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddFoodBinding.inflate(layoutInflater)
@@ -32,6 +36,7 @@ class AddFoodActivity : BaseActivity() {
 
 
     fun takePicture(viewModel: AddFoodViewModel) {
+        currentTimeMillis = Date().time.toString()
         addFoodViewModel = viewModel
         if (ContextCompat.checkSelfPermission(
                 this,
@@ -44,7 +49,7 @@ class AddFoodActivity : BaseActivity() {
                 this, arrayOf(Manifest.permission.CAMERA), MY_PERMISSIONS_REQUEST_CAMERA
             )
         } else {
-            addFoodViewModel.imageUri = ImageUtils.takePictureFromCamera(this)
+            addFoodViewModel.imageUri = ImageUtils.takePictureFromCamera(this, currentTimeMillis)
         }
 
 
@@ -52,12 +57,32 @@ class AddFoodActivity : BaseActivity() {
 
     fun takeExistentPicture(viewModel: AddFoodViewModel) {
         addFoodViewModel = viewModel
+
+        // Verificar si el permiso ya está otorgado
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            ) == PackageManager.PERMISSION_GRANTED
+        ) {
+            takePictureFromStorage()
+        } else {
+            // Solicitar permiso en tiempo de ejecución
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                READ_EXTERNAL_STORAGE_PERMISSION_CODE
+            )
+        }
+
+
+    }
+
+    private fun takePictureFromStorage() {
         val intent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         intent.setType("image/*")
         val mimeTypes = arrayOf("image/jpeg", "image/png")
         intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes)
         startActivityForResult(intent, REQUEST_CODE_IMAGE_PICKER)
-
     }
 
 
@@ -66,33 +91,30 @@ class AddFoodActivity : BaseActivity() {
         if (resultCode == RESULT_OK)
             when (requestCode) {
                 REQUEST_CAPTURE_IMAGE -> {
+
                     val bitmap = MediaStore.Images.Media.getBitmap(
                         contentResolver,
                         addFoodViewModel.imageUri
                     )
-                    val rotatedBitmap = rotateBitmap(
+                    val rotatedBitmap = getRotatedBitmapFromFilePath(
                         bitmap,
                         getExternalFilesDir(Environment.DIRECTORY_PICTURES).toString() +
-                                "/TakenFromCamera.jpg"
+                                "/${currentTimeMillis}.jpg"
                     )
-                    addFoodViewModel.updateProfileBitmap(rotatedBitmap)
+
+                    val imagePath = ImageUtils.createDirectoryAndSaveImage(
+                        this,
+                        rotatedBitmap,
+                        currentTimeMillis
+                    )
+                    addFoodViewModel.updateProfileBitmap(imagePath)
                     addFoodViewModel.bottomSheetState.value =
                         BottomSheetState(initialValue = BottomSheetValue.Collapsed)
 
                 }
 
                 REQUEST_CODE_IMAGE_PICKER -> {
-                    val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, data?.data)
-                    val rotatedBitmap =
-                        data?.data?.let {
-                            ImageUtils.getImageFilePath(it, contentResolver)?.let {
-                                rotateBitmap(
-                                    bitmap,
-                                    it
-                                )
-                            }
-                        }
-                    addFoodViewModel.updateProfileBitmap(rotatedBitmap ?: bitmap)
+                    addFoodViewModel.updateProfileBitmap(ImageUtils.getAbsolutePathFromUri(data?.data, contentResolver))
                     addFoodViewModel.bottomSheetState.value =
                         BottomSheetState(initialValue = BottomSheetValue.Collapsed)
                 }
@@ -113,8 +135,15 @@ class AddFoodActivity : BaseActivity() {
         when (requestCode) {
             MY_PERMISSIONS_REQUEST_CAMERA -> {
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    addFoodViewModel.imageUri = ImageUtils.takePictureFromCamera(this)
+                    addFoodViewModel.imageUri =
+                        ImageUtils.takePictureFromCamera(this, currentTimeMillis)
                 }
+            }
+            READ_EXTERNAL_STORAGE_PERMISSION_CODE -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                        takePictureFromStorage()
+                }
+
             }
         }
     }

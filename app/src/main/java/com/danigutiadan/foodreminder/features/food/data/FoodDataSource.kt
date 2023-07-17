@@ -4,7 +4,7 @@ import com.danigutiadan.foodreminder.api.ApiService
 import com.danigutiadan.foodreminder.database.FoodReminderDatabase
 import com.danigutiadan.foodreminder.features.food.data.model.BarcodeFoodResponse
 import com.danigutiadan.foodreminder.features.food.data.model.Food
-import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.FoodInfo
 import com.danigutiadan.foodreminder.utils.Response
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -42,12 +42,12 @@ class FoodDataSource @Inject constructor(private val service: ApiService, privat
 
     }.flowOn(Dispatchers.IO)
 
-    fun getAllFood(): Flow<List<FoodWithFoodType>> = flow {
+    fun getAllFood(): Flow<List<FoodInfo>> = flow {
         val response = db.foodDao().getFoodWithFoodType()
         emit(response)
     }.flowOn(Dispatchers.IO)
 
-    fun getFoodById(id: Int): Flow<FoodWithFoodType> = flow {
+    fun getFoodById(id: Int): Flow<FoodInfo> = flow {
         val response = db.foodDao().getFoodWithFoodTypeById(id)!!
         emit(response)
     }.flowOn(Dispatchers.IO)

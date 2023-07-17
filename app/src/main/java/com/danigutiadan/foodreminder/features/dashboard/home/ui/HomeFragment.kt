@@ -10,7 +10,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import com.danigutiadan.foodreminder.BaseFragment
 import com.danigutiadan.foodreminder.features.dashboard.home.ui.screens.HomeScreen
-import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.FoodInfo
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,7 +24,7 @@ class HomeFragment : BaseFragment() {
         // Inflate the layout for this fragment
         return ComposeView(requireContext()).apply {
             setContent {
-                val foodList: List<FoodWithFoodType> by homeViewModel.foodListState.collectAsState()
+                val foodList: List<FoodInfo> by homeViewModel.foodListState.collectAsState()
                 HomeScreen(
                     addFoodButtonListener = {
                         // findNavController().navigate(HomeFragmentDirections.actionDashboardNavigationHomeToAddFoodFragment())

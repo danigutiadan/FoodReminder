@@ -1,7 +1,6 @@
 package com.danigutiadan.foodreminder.features.dashboard.home.ui.components
 
 import android.annotation.SuppressLint
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,26 +24,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.danigutiadan.foodreminder.R
 import com.danigutiadan.foodreminder.features.food.data.model.Food
 import com.danigutiadan.foodreminder.features.food.data.model.FoodStatus
-import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.FoodInfo
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.foodreminder.utils.DateUtils.formatDateToString
-import com.danigutiadan.foodreminder.utils.ImageUtils
 import java.util.Date
 
 @Composable
 fun FoodItem(
-    food: FoodWithFoodType,
-    onEditButtonPressed: (FoodWithFoodType) -> Unit,
-    onDeleteButtonPressed: (FoodWithFoodType) -> Unit,
+    food: FoodInfo,
+    onEditButtonPressed: (FoodInfo) -> Unit,
+    onDeleteButtonPressed: (FoodInfo) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -61,17 +60,21 @@ fun FoodItem(
                 )
             )
         ) {
-            val painter = if (food.food.image != null)
-                rememberAsyncImagePainter(food.food.image)
-            else
-                painterResource(id = R.drawable.add_food_placeholder)
-            Image(
-                painter = painter, contentDescription = "",
+
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(food.food.foodImageUrl)
+                    .crossfade(true)
+                    .error(R.drawable.add_food_placeholder)
+                    .build(),
+                contentDescription = "",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(105.dp)
             )
+
+
             Column() {
                 Column(
                     modifier = Modifier
@@ -160,7 +163,7 @@ private fun getItemBackgroundColor(foodState: FoodStatus): Color {
 @Composable
 fun PreviewActivityItem() {
     FoodItem(
-        food = FoodWithFoodType(1, Food(6, "Pollo", 1, Date(), 1, 1), FoodType(1, "Hola")),
+        food = FoodInfo(1, Food(6, "Pollo", 1, Date(), 1, 1), FoodType(1, "Hola")),
         {},
         {})
 }

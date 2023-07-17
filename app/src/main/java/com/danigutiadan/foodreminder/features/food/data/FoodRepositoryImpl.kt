@@ -1,11 +1,9 @@
 package com.danigutiadan.foodreminder.features.food.data
 
-import android.graphics.Bitmap
 import com.danigutiadan.foodreminder.features.food.data.model.BarcodeFoodResponse
 import com.danigutiadan.foodreminder.features.food.domain.FoodRepository
 import com.danigutiadan.foodreminder.features.food.data.model.Food
-import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
-import com.danigutiadan.foodreminder.utils.ImageUtils
+import com.danigutiadan.foodreminder.features.food.data.model.FoodInfo
 import com.danigutiadan.foodreminder.utils.Response
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
@@ -23,7 +21,7 @@ class FoodRepositoryImpl @Inject constructor(private val foodDataSource: FoodDat
         foodType: Int,
         expiryDate: Date,
         daysBeforeExpiration: Int,
-        foodBitmap: Bitmap?
+        foodImageUrl: String
     ): Flow<Response<Unit>> {
         val food = Food(
             name = name,
@@ -31,15 +29,15 @@ class FoodRepositoryImpl @Inject constructor(private val foodDataSource: FoodDat
             foodType = foodType,
             expiryDate = expiryDate,
             daysBeforeExpirationNotification = daysBeforeExpiration,
-            image = foodBitmap
+            foodImageUrl = foodImageUrl
         )
         return foodDataSource.doSaveFood(food)
     }
 
-    override fun getAllFood(): Flow<List<FoodWithFoodType>> =
+    override fun getAllFood(): Flow<List<FoodInfo>> =
         foodDataSource.getAllFood()
 
-    override fun getFoodById(id: Int): Flow<FoodWithFoodType> =
+    override fun getFoodById(id: Int): Flow<FoodInfo> =
         foodDataSource.getFoodById(id)
 
     override fun deleteFood(food: Food): Flow<Response<Unit>> =

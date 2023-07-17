@@ -71,7 +71,6 @@ fun AddFoodScreen(
     saveFoodListener: () -> Unit,
     onExpiryDateSelected: (Date) -> Unit,
     foodTypeListState: Response<List<FoodType>>? = null,
-    foodBitmap: Bitmap?,
     bottomSheetPictureDialogState: BottomSheetState,
     closePictureDialog: Boolean,
     doCloseDialog: () -> Unit,
@@ -89,7 +88,7 @@ fun AddFoodScreen(
     onQuantityMinusPressed: () -> Unit,
     onDaysBeforeExpirationPlusPressed: () -> Unit,
     onDaysBeforeExpirationMinusPressed: () -> Unit,
-    imageUrl: String,
+    remoteImageUrl: String,
     isNameError: Boolean,
     isQuantityError: Boolean,
     isFoodTypeError: Boolean,
@@ -166,9 +165,8 @@ fun AddFoodScreen(
                                 ) {
                                 //Image
                                 FoodImage(
-                                    foodBitmap,
                                     { scope.launch { bottomSheetPictureDialogState.expand() } },
-                                    imageUrl
+                                     remoteImageUrl
                                 )
                             }
 
@@ -344,11 +342,9 @@ private fun ExpiryDateText(
 }
 
 @Composable
-fun FoodImage(imageBitmap: Bitmap?, onClickImage: () -> Unit, imageUrl: String) {
+fun FoodImage(onClickImage: () -> Unit, imageUrl: String) {
     val painter = if (imageUrl.isNotBlank())
         rememberAsyncImagePainter(imageUrl)
-    else if (imageBitmap != null)
-        rememberAsyncImagePainter(imageBitmap)
     else painterResource(R.drawable.add_food_placeholder)
 
     Image(painter = painter,
@@ -590,7 +586,6 @@ fun PreviewAddFoodScreen() {
         {},
         {},
         Response.Success(listOf()),
-        null,
         BottomSheetState(),
         true,
         {},
@@ -613,6 +608,6 @@ fun PreviewAddFoodScreen() {
         true,
         true,
         true,
-        true,
+        false
     )
 }

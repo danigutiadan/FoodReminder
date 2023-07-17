@@ -1,6 +1,5 @@
 package com.danigutiadan.foodreminder.features.food.data.model
 
-import android.graphics.Bitmap
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
 import androidx.room.Entity
@@ -42,8 +41,8 @@ data class Food(
     @ColumnInfo(name = "food_type_Id", index = true)
     val foodType: Int,
 
-    @ColumnInfo(name = "food_image", typeAffinity = ColumnInfo.BLOB)
-    val image: Bitmap? = null,
+    @ColumnInfo(name = "food_image_url")
+    val foodImageUrl: String? = null,
 
     var foodStatus: FoodStatus? = null
 
@@ -80,7 +79,7 @@ data class Food(
     }
 }
 
-data class FoodWithFoodType(
+data class FoodInfo(
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null,
 

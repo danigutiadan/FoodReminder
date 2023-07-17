@@ -1,6 +1,5 @@
 package com.danigutiadan.foodreminder.features.add_food.ui
 
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -50,9 +49,6 @@ class AddFoodViewModel @Inject constructor(
     val bottomSheetState = MutableStateFlow(BottomSheetState(BottomSheetValue.Collapsed))
     var imageUri: Uri? = null
 
-    private val _foodBitmap = MutableStateFlow<Bitmap?>(null)
-    val foodBitmap: StateFlow<Bitmap?> = _foodBitmap
-
     private val _foodTypeList = MutableStateFlow<Response<List<FoodType>>>(Response.Loading)
     val foodTypeList: StateFlow<Response<List<FoodType>>> = _foodTypeList
 
@@ -76,7 +72,6 @@ class AddFoodViewModel @Inject constructor(
 
     private val _foodTypeByBarcodeState =
         MutableStateFlow<Response<BarcodeFoodResponse?>>(Response.Loading)
-    val foodTypeByBarcodeState: StateFlow<Response<BarcodeFoodResponse?>> = _foodTypeByBarcodeState
 
     fun getAllFoodTypes() {
         getAllFoodTypesUseCase.execute()
@@ -85,9 +80,8 @@ class AddFoodViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun updateProfileBitmap(bitmap: Bitmap) {
-        _foodBitmap.value = bitmap
-        _foodImageUrl.value = ""
+    fun updateProfileBitmap(filePath: String? = null) {
+        _foodImageUrl.value = filePath ?: ""
     }
 
     fun onFoodQuantityChanged(quantity: String) {
@@ -115,8 +109,8 @@ class AddFoodViewModel @Inject constructor(
 
                     if (response is Response.Success) {
                         if (response.data?.products?.isNotEmpty() == true) {
-                            _foodName.value = response.data?.products?.first()?.name.toString()
-                            _foodImageUrl.value = response.data?.products?.first()?.imageUrl ?: ""
+                            _foodName.value = response.data.products?.first()?.name.toString()
+                            _foodImageUrl.value = response.data.products?.first()?.imageUrl ?: ""
                         }
                     }
                 }
@@ -156,7 +150,7 @@ class AddFoodViewModel @Inject constructor(
             foodType = _foodType.value?.id!!,
             expiryDate = _expiryDate.value!!,
             daysBeforeExpiration = _daysBeforeExpiration.value.toInt(),
-            foodBitmap = _foodBitmap.value
+            foodImageUrl = _foodImageUrl.value
         )
             .onStart { }
             .onEach {
@@ -175,12 +169,6 @@ class AddFoodViewModel @Inject constructor(
             .and(_foodType.value?.id != null)
             .and(_expiryDate.value != null)
             .and(_daysBeforeExpiration.value.toInt() >= 1)
-    }
-
-    fun updateFoodImage(bitmap: Bitmap?) {
-        if (bitmap != null) {
-            _foodBitmap.value = bitmap
-        }
     }
 
 }

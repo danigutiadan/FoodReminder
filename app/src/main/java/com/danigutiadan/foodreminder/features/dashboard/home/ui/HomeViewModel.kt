@@ -6,7 +6,7 @@ import com.danigutiadan.foodreminder.Preferences
 import com.danigutiadan.foodreminder.features.food.domain.usecase.GetAllFoodUseCase
 import com.danigutiadan.foodreminder.features.dashboard.profile.domain.usecases.LogoutUseCase
 import com.danigutiadan.foodreminder.features.food.domain.usecase.DeleteFoodUseCase
-import com.danigutiadan.foodreminder.features.food.data.model.FoodWithFoodType
+import com.danigutiadan.foodreminder.features.food.data.model.FoodInfo
 import com.danigutiadan.foodreminder.features.food_type.domain.usecases.InsertFoodTypeUseCase
 import com.danigutiadan.foodreminder.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -25,8 +25,8 @@ class HomeViewModel @Inject constructor(
     private val _logoutState = MutableStateFlow<Response<Void>>(Response.Loading)
     val logoutState: StateFlow<Response<Void>> = _logoutState
 
-    private val _foodListState = MutableStateFlow<List<FoodWithFoodType>>(mutableListOf())
-    val foodListState: StateFlow<List<FoodWithFoodType>> = _foodListState
+    private val _foodListState = MutableStateFlow<List<FoodInfo>>(mutableListOf())
+    val foodListState: StateFlow<List<FoodInfo>> = _foodListState
 
     private val _deleteFoodState = MutableStateFlow<Response<Unit>>(Response.Loading)
     val deleteFoodState: StateFlow<Response<Unit>> = _deleteFoodState
@@ -45,12 +45,12 @@ class HomeViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
-    fun deleteFoodFromList(food: FoodWithFoodType) {
+    fun deleteFoodFromList(food: FoodInfo) {
         deleteFoodUseCase.execute(food.food)
             .onStart { _deleteFoodState.value = Response.Loading }
             .onEach { _deleteFoodState.value = Response.EmptySuccess }
             .launchIn(viewModelScope)
-        val mutableList: MutableList<FoodWithFoodType> = _foodListState.value.toMutableList()
+        val mutableList: MutableList<FoodInfo> = _foodListState.value.toMutableList()
         mutableList.remove(food)
         _foodListState.value = mutableList
     }
