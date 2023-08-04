@@ -1,5 +1,6 @@
 package com.danigutiadan.foodreminder
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -19,7 +20,6 @@ import com.danigutiadan.foodreminder.features.dashboard.DashboardActivity
 import com.danigutiadan.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.foodreminder.features.food_type.ui.FoodTypeViewModel
 import com.danigutiadan.foodreminder.features.onboarding.ui.OnboardingActivity
-import com.google.android.libraries.places.api.Places
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Locale
 import kotlin.concurrent.thread
@@ -27,21 +27,51 @@ import kotlin.concurrent.thread
 @AndroidEntryPoint
 class MainActivity : BaseActivity() {
     private val foodTypeViewModel: FoodTypeViewModel by viewModels()
-    private val foodTypes = listOf("Frutas", "Verduras", "Carnes", "Lácteos", "Cereales", "Legumbres")
+    private val foodTypes = listOf(
+        R.string.category_fruits,
+        R.string.category_vegetables,
+        R.string.category_meat,
+        R.string.category_fish_seafood,
+        R.string.category_dairy,
+        R.string.category_bread_cereals,
+        R.string.category_legumes,
+        R.string.category_sweets_desserts,
+        R.string.category_beverages,
+        R.string.category_frozen_foods,
+        R.string.category_canned_goods,
+        R.string.category_snacks_appetizers,
+        R.string.category_sauces,
+        R.string.category_ice_creams,
+        R.string.category_juices_soft_drinks,
+        R.string.category_pasta_sauces,
+        R.string.category_eggs,
+        R.string.category_nuts,
+        R.string.category_ready_meals,
+        R.string.category_breakfast_cereals,
+        R.string.category_bakery_products,
+        R.string.category_fast_food,
+        R.string.category_breakfast_items,
+        R.string.category_condiments_spices,
+        R.string.category_cheeses,
+        R.string.category_soups_broths,
+        R.string.category_oils_vinegars,
+        R.string.category_ready_dishes,
+        R.string.category_gluten_free,
+        R.string.category_organic_foods,
+        R.string.category_baby_foods
+    )
+
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if(preferences.isDatabaseInitialized == false)
         foodTypes.forEach { foodType ->
-            foodTypeViewModel.insertFoodType(FoodType(name = foodType))
+            foodTypeViewModel.insertFoodType(FoodType(name = getString(foodType)))
             preferences.isDatabaseInitialized = true
         }
 
         foodTypeViewModel.getAllFoodTypes()
-
-
-        Places.initialize(this, "AIzaSyCVVw3jI_eaOdBNx1bN8YffqdGualTGKYI", Locale("es_ES"))
-
 
         setContent {
             SplashScreen()
@@ -55,9 +85,9 @@ class MainActivity : BaseActivity() {
                     if (preferences.user?.isRegisterCompleted == false) {
                         startActivity(Intent(this, OnboardingActivity::class.java))
                     } else
-                        startActivity(Intent(this, DashboardActivity::class.java))
+                        navigator.navigateToDashboard(this, true)
                 } else
-                    startActivity(Intent(this, DashboardActivity::class.java))
+                    navigator.navigateToDashboard(this, true)
             }
 
         }

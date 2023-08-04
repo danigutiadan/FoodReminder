@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -50,7 +51,7 @@ fun FoodItem(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(180.dp)
+            .height(190.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -71,7 +72,7 @@ fun FoodItem(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxHeight()
-                    .width(105.dp)
+                    .width(115.dp)
             )
 
 
@@ -79,7 +80,7 @@ fun FoodItem(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 20.dp, end = 20.dp, top = 20.dp),
+                        .padding(start = 20.dp, end = 20.dp, top = 10.dp),
                     verticalArrangement = Arrangement.Center,
                 ) {
                     Text(
@@ -91,20 +92,20 @@ fun FoodItem(
                         color = Color.White
                     )
                     Text(
-                        text = "Fecha de caducidad: ${formatDateToString(food.food.expiryDate)}",
+                        text = "${stringResource(id = R.string.expiration_date)}: ${formatDateToString(food.food.expiryDate)}",
                         fontSize = 16.sp,
                         color = Color.White,
                         modifier = Modifier.padding(bottom = 5.dp)
                     )
                     Text(
-                        text = "Tipo de alimento: ${food.foodType.name}",
+                        text = "${stringResource(id = R.string.food_type)}: ${food.foodType.name}",
                         fontSize = 16.sp,
                         color = Color.White,
                         modifier = Modifier.padding(bottom = 5.dp)
                     )
 
                     Text(
-                        text = "Cantidad: 3",
+                        text = "${stringResource(id = R.string.quantity)}: ${food.food.quantity}",
                         fontSize = 16.sp,
                         color = Color.White,
                         modifier = Modifier.padding(bottom = 5.dp)
@@ -163,7 +164,7 @@ private fun getItemBackgroundColor(foodState: FoodStatus): Color {
 @Composable
 fun PreviewActivityItem() {
     FoodItem(
-        food = FoodInfo(1, Food(6, "Pollo", 1, Date(), 1, 1), FoodType(1, "Hola")),
+        food = FoodInfo(1, Food(6, "Pollo", 1, Date(), 1, 1), FoodType(1, "Alimentos congelados")),
         {},
         {})
 }

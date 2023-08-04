@@ -5,7 +5,6 @@ import com.danigutiadan.foodreminder.FoodReminderNavigator
 import com.danigutiadan.foodreminder.Preferences
 import com.danigutiadan.foodreminder.api.ApiService
 import com.danigutiadan.foodreminder.database.FoodReminderDatabase
-import com.google.android.libraries.places.api.Places
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
@@ -40,10 +39,6 @@ object AppModule {
     @Singleton
     @Provides
     fun provideFirebaseStorage() = Firebase.storage
-
-    @Singleton
-     @Provides
-    fun  providePlacesClient(app: Application) = Places.createClient(app)
 
 
 

@@ -9,6 +9,8 @@ import com.danigutiadan.foodreminder.features.dashboard.profile.domain.usecases.
 import com.danigutiadan.foodreminder.features.food.domain.usecase.GetFoodByIdUseCase
 import com.danigutiadan.foodreminder.features.food.domain.FoodRepository
 import com.danigutiadan.foodreminder.features.food.domain.usecase.DeleteFoodUseCase
+import com.danigutiadan.foodreminder.features.food.domain.usecase.GetFoodWithFiltersUseCase
+import com.danigutiadan.foodreminder.features.food.domain.usecase.UpdateFoodUseCase
 import com.danigutiadan.foodreminder.features.food_type.domain.repository.FoodTypeRepository
 import com.danigutiadan.foodreminder.features.food_type.domain.usecases.GetAllFoodTypesUseCase
 import com.danigutiadan.foodreminder.features.food_type.domain.usecases.InsertFoodTypeUseCase
@@ -89,6 +91,16 @@ object UseCaseModule {
     @Provides
     fun provideDeleteFoodUseCase(foodRepository: FoodRepository) =
         DeleteFoodUseCase(foodRepository = foodRepository)
+
+    @Singleton
+    @Provides
+    fun provideGetFoodWithFiltersUseCase(foodRepository: FoodRepository) =
+        GetFoodWithFiltersUseCase(foodRepository = foodRepository)
+
+    @Singleton
+    @Provides
+    fun provideUpdateFoodUseCase(foodRepository: FoodRepository) =
+        UpdateFoodUseCase(foodRepository = foodRepository)
 
 
 }

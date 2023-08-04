@@ -1,6 +1,5 @@
 package com.danigutiadan.foodreminder.features.add_food.ui.screens
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -24,11 +23,13 @@ import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarDuration
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -44,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -94,6 +96,8 @@ fun AddFoodScreen(
     isFoodTypeError: Boolean,
     isExpiryDateError: Boolean,
     isDaysBeforeExpirationError: Boolean,
+    selectedFoodType: FoodType?,
+    isFoodAddedSuccessfully: Boolean
 ) {
     val scope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
@@ -109,13 +113,13 @@ fun AddFoodScreen(
                 }
             },
             title = {
-                Text("Añade tu alimento", style = MaterialTheme.typography.h6, color = Color.White)
+                Text(stringResource(id = R.string.add_food_prompt), style = MaterialTheme.typography.h6, color = Color.White)
             },
             backgroundColor = Color(0xFF8BC34A),
             actions = {
                 IconButton(onClick = { barcodeClickListener() }) {
                     Icon(
-                        imageVector = Icons.Filled.Search,
+                        painter = painterResource(id = R.drawable.ic_barcode),
                         contentDescription = "",
                         tint = Color.White
                     )
@@ -190,18 +194,18 @@ fun AddFoodScreen(
 
                 }
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(text = "¿Cuál es el nombre de tu producto?")
+                Text(text = stringResource(id = R.string.product_name_prompt))
                 Spacer(modifier = Modifier.height(5.dp))
                 AddFoodNameTextField(
                     input = foodName,
-                    placeHolder = "Nombre del producto",
+                    placeHolder = stringResource(id = R.string.product_name),
                     isNameError = isNameError,
                     onValueChanged = {
                         onFoodNameChanged(it)
                     })
 
                 Spacer(modifier = Modifier.height(12.dp))
-                Text(text = "¿Cuántas unidades, paquetes, bricks... tienes?")
+                Text(text = stringResource(id = R.string.quantity_prompt))
                 Spacer(modifier = Modifier.height(5.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -240,7 +244,8 @@ fun AddFoodScreen(
                         FoodTypeDropdownMenu(
                             foodTypeList = foodTypeListState.data,
                             onFoodTypeSelected = onFoodTypeSelected,
-                            isFoodTypeError
+                            isFoodTypeError,
+                            selectedFoodType = selectedFoodType
                         )
                     }
 
@@ -250,7 +255,7 @@ fun AddFoodScreen(
                 val showDatePicker = remember { mutableStateOf(false) }
 
 
-                Text(text = "Introduce la fecha de caducidad de tu producto")
+                Text(text = stringResource(id = R.string.expiration_date_prompt))
                 Spacer(modifier = Modifier.height(5.dp))
 
                 ExpiryDateText(showDatePicker, dateSelected, isExpiryDateError)
@@ -258,7 +263,7 @@ fun AddFoodScreen(
 
                 if (showDatePicker.value) {
                     CustomDatePickerDialog(
-                        label = "Fecha de caducidad",
+                        label = stringResource(id = R.string.expiration_date),
                         onDateSelected = { date ->
                             onExpiryDateSelected(date)
                         },
@@ -267,7 +272,7 @@ fun AddFoodScreen(
                         })
                 }
 
-                Text(text = "¿Cuántos días antes de la fecha de caducidad deseas recibir una notificación?")
+                Text(text = stringResource(id = R.string.notification_days_prompt))
                 Spacer(modifier = Modifier.height(5.dp))
                 AddTimeLeftTextField(
                     input = daysBeforeExpiration,
@@ -277,6 +282,10 @@ fun AddFoodScreen(
                     isDaysBeforeExpirationError = isDaysBeforeExpirationError
                 )
 
+            }
+
+            if(isFoodAddedSuccessfully) {
+                MySnackBar(message = stringResource(id = R.string.product_added), actionLabel = "")
             }
         }
 
@@ -289,14 +298,14 @@ fun AddFoodScreen(
             Column(Modifier.background(Color(0xFFECECEC))) {
                 AddProfileImageButtonSheetDialog(
                     onClick = { onTakePicture() },
-                    text = "Tomar foto",
+                    text = stringResource(id = R.string.take_photo),
                     interactionSource = interactionSource
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
                 AddProfileImageButtonSheetDialog(
                     onClick = { onGetExistentPicture() },
-                    text = "Elegir foto existente",
+                    text = stringResource(id = R.string.choose_existing_photo),
                     interactionSource = interactionSource
                 )
                 Spacer(modifier = Modifier.height(10.dp))
@@ -316,7 +325,7 @@ fun AddFoodScreen(
 }
 
 @Composable
-private fun ExpiryDateText(
+fun ExpiryDateText(
     showDatePicker: MutableState<Boolean>,
     dateSelected: Date?,
     isExpiryDateError: Boolean
@@ -333,7 +342,7 @@ private fun ExpiryDateText(
             .fillMaxWidth()
             .padding(start = 12.dp, end = 30.dp, top = 10.dp, bottom = 10.dp)
             .noRippleClickable { showDatePicker.value = true },
-        text = if (formatDateToString(dateSelected).isNullOrBlank()) "Fecha de caducidad" else formatDateToString(
+        text = if (formatDateToString(dateSelected).isNullOrBlank()) stringResource(id = R.string.expiration_date) else formatDateToString(
             dateSelected
         )!!,
         fontSize = 18.sp,
@@ -373,18 +382,18 @@ fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
 fun FoodTypeDropdownMenu(
     foodTypeList: List<FoodType>,
     onFoodTypeSelected: (FoodType) -> Unit,
-    isFoodTypeError: Boolean
+    isFoodTypeError: Boolean,
+    selectedFoodType: FoodType?
 ) {
     val dropdownExpanded = remember { mutableStateOf(false) }
-    val selectedOption: MutableState<FoodType?> = remember { mutableStateOf(null) }
 
-    Text(text = "¿Qué tipo de alimento es?")
+    Text(text = stringResource(id = R.string.food_type_prompt))
     Spacer(modifier = Modifier.height(5.dp))
     Column {
         Text(
-            text = if (selectedOption.value?.name.isNullOrBlank()) "Tipo de alimento" else "${selectedOption.value?.name}",
+            text = if (selectedFoodType?.name.isNullOrBlank()) stringResource(id = R.string.food_type) else selectedFoodType?.name ?: "",
             fontSize = 18.sp,
-            color = if (selectedOption.value?.name.isNullOrBlank()) Color.Gray else Color.Black,
+            color = if (selectedFoodType?.name.isNullOrBlank()) Color.Gray else Color.Black,
             modifier = Modifier
                 .border(
                     width = 1.5.dp,
@@ -404,7 +413,6 @@ fun FoodTypeDropdownMenu(
             foodTypeList.forEach {
                 DropdownMenuItem(onClick = {
                     onFoodTypeSelected(it)
-                    selectedOption.value = it
                     dropdownExpanded.value = false
                 }) {
                     Text(text = it.name)
@@ -499,9 +507,9 @@ fun AddFoodQuantityTextField(
                     )
                 )
                 val text: String = if (input.isNotBlank()) {
-                    if (input.toInt() == 1) " unidad" else " unidades"
+                    if (input.toInt() == 1) " ${stringResource(id = R.string.unit)}" else " ${stringResource(id = R.string.units)}"
                 } else
-                    " unidades"
+                    " ${stringResource(id = R.string.units)}"
 
                 Text(text = text, fontSize = 18.sp)
             }
@@ -547,9 +555,11 @@ fun AddTimeLeftTextField(
                     )
                 )
                 val text: String = if (input.isNotBlank()) {
-                    if (input.toInt() == 1) " día antes" else " días antes"
+                    if (input.toInt() == 1) " ${stringResource(id = R.string.day_before)}" else " ${stringResource(
+                        id = R.string.days_before
+                    )}"
                 } else
-                    " días antes"
+                    " ${stringResource(id = R.string.days_before)}"
 
                 Text(text = text, fontSize = 18.sp)
 
@@ -575,6 +585,24 @@ fun AddTimeLeftTextField(
         }
     }
 
+}
+
+@Composable
+fun MySnackBar(
+    message: String, actionLabel: String, duration: SnackbarDuration = SnackbarDuration.Short
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(snackbarHostState) {
+        snackbarHostState.showSnackbar(message, actionLabel, duration = duration)
+    }
+    Box(
+        Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
+    ) {
+        SnackbarHost(
+            hostState = snackbarHostState
+        )
+    }
 }
 
 @Preview
@@ -608,6 +636,8 @@ fun PreviewAddFoodScreen() {
         true,
         true,
         true,
+        false,
+        FoodType(1, "Legumbres"),
         false
     )
 }

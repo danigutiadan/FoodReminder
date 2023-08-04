@@ -5,6 +5,8 @@ import com.danigutiadan.foodreminder.database.FoodReminderDatabase
 import com.danigutiadan.foodreminder.features.food.data.model.BarcodeFoodResponse
 import com.danigutiadan.foodreminder.features.food.data.model.Food
 import com.danigutiadan.foodreminder.features.food.data.model.FoodInfo
+import com.danigutiadan.foodreminder.features.food.data.model.FoodOrder
+import com.danigutiadan.foodreminder.features.food.data.model.FoodStatus
 import com.danigutiadan.foodreminder.utils.Response
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -12,7 +14,10 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import javax.inject.Inject
 
-class FoodDataSource @Inject constructor(private val service: ApiService, private val db: FoodReminderDatabase) {
+class FoodDataSource @Inject constructor(
+    private val service: ApiService,
+    private val db: FoodReminderDatabase
+) {
 
     suspend fun doGetFoodInfoByBarcode(barcode: String): Flow<Response<BarcodeFoodResponse>> =
         flow {
@@ -34,16 +39,44 @@ class FoodDataSource @Inject constructor(private val service: ApiService, privat
             }
         }
 
-     fun doSaveFood(
+    fun doSaveFood(
         food: Food
     ) = flow {
         emit(Response.Loading)
-        db.foodDao().insertFood(food)
+        try {
+            db.foodDao().insertFood(food)
+            emit(Response.EmptySuccess)
+        } catch (e: java.lang.Exception) {
+            emit(Response.Error(e))
+        }
+
+    }.flowOn(Dispatchers.IO)
+
+    fun doUpdateFood(
+        food: Food
+    ) = flow {
+        emit(Response.Loading)
+        try {
+            db.foodDao().updateFood(food)
+            emit(Response.EmptySuccess)
+        } catch (e: java.lang.Exception) {
+            emit(Response.Error(e))
+        }
 
     }.flowOn(Dispatchers.IO)
 
     fun getAllFood(): Flow<List<FoodInfo>> = flow {
         val response = db.foodDao().getFoodWithFoodType()
+        emit(response)
+    }.flowOn(Dispatchers.IO)
+
+    fun getAllFoodWithFilters(
+        foodType: Int? = null,
+        foodStatus: Int? = null,
+        name: String? = null,
+        foodOrder: FoodOrder? = null
+    ): Flow<List<FoodInfo>> = flow {
+        val response = db.foodDao().getFoodListWithFilters(foodType, foodStatus, name, foodOrder)
         emit(response)
     }.flowOn(Dispatchers.IO)
 

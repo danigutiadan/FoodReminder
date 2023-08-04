@@ -73,6 +73,9 @@ class AddFoodViewModel @Inject constructor(
     private val _foodTypeByBarcodeState =
         MutableStateFlow<Response<BarcodeFoodResponse?>>(Response.Loading)
 
+    private val _isFoodAddedSuccessfully = MutableStateFlow(false)
+    val isFoodAddedSuccessfully: StateFlow<Boolean> = _isFoodAddedSuccessfully
+
     fun getAllFoodTypes() {
         getAllFoodTypesUseCase.execute()
             .onEach { _foodTypeList.value = Response.Loading }
@@ -154,7 +157,21 @@ class AddFoodViewModel @Inject constructor(
         )
             .onStart { }
             .onEach {
+                if(it == Response.EmptySuccess) {
+                    _isFoodAddedSuccessfully.value = true
+                    resetAllFields()
+                }
             }.launchIn(viewModelScope)
+
+    }
+
+    private fun resetAllFields() {
+        _foodName.value = ""
+        _foodQuantity.value = ""
+        _foodType.value = null
+        _expiryDate.value = null
+        _daysBeforeExpiration.value = "0"
+        _foodImageUrl.value = ""
 
     }
 

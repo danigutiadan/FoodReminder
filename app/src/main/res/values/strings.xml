@@ -1,7 +1,82 @@
 <resources>
-    <string name="app_name">Chill.in</string>
+    <string name="app_name" translatable="false">FoodReminder</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="user_info">user_info</string>
-    <string name="is_database_initialized">is_database_initialized</string>
+    <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="user_info" translatable="false">user_info</string>
+    <string name="is_database_initialized" translatable="false">is_database_initialized</string>,
+    <string name="add_food_prompt">Añade tu alimento</string>
+    <string name="product_name_prompt">¿Cuál es el nombre de tu producto?</string>
+    <string name="quantity_prompt">¿Cuántas unidades, paquetes, bricks… tienes?</string>
+    <string name="expiration_date_prompt">Introduce la fecha de caducidad de tu producto</string>
+    <string name="expiration_date">Fecha de caducidad</string>
+    <string name="notification_days_prompt">¿Cuántos días antes de la fecha de caducidad deseas recibir una notificación?</string>
+    <string name="product_added">Producto añadido correctamente</string>
+    <string name="take_photo">Tomar foto</string>
+    <string name="choose_existing_photo">Elegir foto existente</string>
+    <string name="food_type_prompt">¿Qué tipo de alimento es?</string>
+    <string name="food_type">Tipo de alimento</string>
+    <string name="unit">unidad</string>
+    <string name="units">unidades</string>
+    <string name="day_before">día antes</string>
+    <string name="days_before">días antes</string>
+
+    <string name="search_food">Busca tus alimentos</string>
+    <string name="no_food_in_list">No tienes ningún alimento en tu lista aún</string>
+    <string name="most_recent">Más recientes</string>
+    <string name="filters">Filtros</string>
+    <string name="clear_filters">Borrar filtros</string>
+    <string name="apply">Aplicar</string>
+    <string name="status">Estado</string>
+    <string name="all">Todos</string>
+    <string name="edit_food">Edita tu alimento</string>
+    <string name="quantity">Cantidad</string>
+    <string name="product_name">Nombre del producto</string>
+
+    <string name="category_fruits">Frutas</string>
+    <string name="category_vegetables">Verduras</string>
+    <string name="category_meat">Carnes</string>
+    <string name="category_fish_seafood">Pescados y Mariscos</string>
+    <string name="category_dairy">Lácteos</string>
+    <string name="category_bread_cereals">Pan y Cereales</string>
+    <string name="category_legumes">Legumbres</string>
+    <string name="category_sweets_desserts">Dulces y Postres</string>
+    <string name="category_beverages">Bebidas</string>
+    <string name="category_frozen_foods">Alimentos Congelados</string>
+    <string name="category_canned_goods">Conservas</string>
+    <string name="category_snacks_appetizers">Snacks y Aperitivos</string>
+    <string name="category_sauces">Salsas</string>
+    <string name="category_ice_creams">Helados</string>
+    <string name="category_juices_soft_drinks">Zumos y Bebidas Refrescantes</string>
+    <string name="category_pasta_sauces">Pastas y Salsas</string>
+    <string name="category_eggs">Huevos</string>
+    <string name="category_nuts">Frutos Secos</string>
+    <string name="category_ready_meals">Comida Preparada</string>
+    <string name="category_breakfast_cereals">Cereales para el Desayuno</string>
+    <string name="category_bakery_products">Productos de Panadería</string>
+    <string name="category_fast_food">Comida Rápida</string>
+    <string name="category_breakfast_items">Productos para Desayuno</string>
+    <string name="category_condiments_spices">Condimentos y Especias</string>
+    <string name="category_cheeses">Quesos</string>
+    <string name="category_soups_broths">Sopas y Caldos</string>
+    <string name="category_oils_vinegars">Aceites y Vinagres</string>
+    <string name="category_ready_dishes">Platos Preparados</string>
+    <string name="category_gluten_free">Alimentos sin Gluten</string>
+    <string name="category_organic_foods">Alimentos Orgánicos</string>
+    <string name="category_baby_foods">Alimentos para Bebés</string>
+
+    <string name="fresh">Fresco</string>
+    <string name="near_expiry">Cerca de caducar</string>
+    <string name="almost_expired">Casi caducado</string>
+    <string name="food_state_asc">Estado del alimento: Menor a mayor</string>
+    <string name="food_state_desc">Estado del alimento: Mayor a menor</string>
+    <string name="sort_by">Ordenar por</string>
+    <string name="filter">Filtrar</string>
+
+
+
+
+
+
+
+
 </resources>

@@ -47,6 +47,8 @@ class AddFoodFragment : BaseFragment() {
                 val isFoodTypeError: Boolean by viewModel.isFoodTypeError.collectAsState()
                 val isExpiryDateError: Boolean by viewModel.isExpiryDateError.collectAsState()
                 val isDaysBeforeExpirationError: Boolean by viewModel.isDaysBeforeExpirationError.collectAsState()
+                val selectedFoodType: FoodType? by viewModel.foodType.collectAsState()
+                val isFoodAddedSuccessfully: Boolean by viewModel.isFoodAddedSuccessfully.collectAsState()
                 AddFoodScreen(
                     backClickListener = { activity?.onBackPressed() },
                     barcodeClickListener = {
@@ -108,6 +110,8 @@ class AddFoodFragment : BaseFragment() {
                     isFoodTypeError = isFoodTypeError,
                     isExpiryDateError = isExpiryDateError,
                     isDaysBeforeExpirationError = isDaysBeforeExpirationError,
+                    selectedFoodType = selectedFoodType,
+                    isFoodAddedSuccessfully = isFoodAddedSuccessfully
                 )
             }
         }

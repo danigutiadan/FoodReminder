@@ -44,9 +44,13 @@ data class Food(
     @ColumnInfo(name = "food_image_url")
     val foodImageUrl: String? = null,
 
-    var foodStatus: FoodStatus? = null
+    @ColumnInfo(name = "food_status")
+    var foodStatus: FoodStatus? = null,
 
-): Serializable {
+    @ColumnInfo(name = "food_status_int")
+    var foodStatusInt: Int? = null
+
+) : Serializable {
 
     init {
         val expiryDateCalendar = Calendar.getInstance().apply {
@@ -76,6 +80,8 @@ data class Food(
             daysBeforeExpired in 5L..9L -> FoodStatus.ABOUT_TO_EXPIRE
             else -> FoodStatus.ALMOST_EXPIRED
         }
+
+        foodStatusInt = foodStatus?.value
     }
 }
 
@@ -87,10 +93,15 @@ data class FoodInfo(
     val food: Food,
     @Relation(parentColumn = "food_type_Id", entityColumn = "id")
     val foodType: FoodType
-): Serializable
+) : Serializable
 
 enum class FoodStatus(val value: Int) {
     FRESH(1),
     ABOUT_TO_EXPIRE(2),
     ALMOST_EXPIRED(3)
+}
+
+enum class FoodOrder {
+    FOOD_STATUS_ASC,
+    FOOD_STATUS_DESC
 }
