@@ -13,7 +13,7 @@
 
 
     <application
-        android:name=".CoreApplication"
+        android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.CoreApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
@@ -25,17 +25,17 @@
         android:theme="@style/Theme.FoodReminder"
         tools:targetApi="31">
         <activity
-            android:name=".features.edit_food.ui.EditFoodActivity"
+            android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.edit_food.ui.EditFoodActivity"
             android:exported="false" />
         <activity
-            android:name=".features.add_food.ui.AddFoodActivity"
+            android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.AddFoodActivity"
             android:exported="false" />
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="screenOrientation" />
         <activity
-            android:name=".features.dashboard.DashboardActivity"
+            android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.dashboard.DashboardActivity"
             android:exported="false"
             android:screenOrientation="portrait">
             <meta-data
@@ -43,7 +43,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".features.onboarding.ui.OnboardingActivity"
+            android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.onboarding.ui.OnboardingActivity"
             android:exported="false"
             android:screenOrientation="portrait">
             <meta-data
@@ -51,7 +51,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.MainActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
@@ -63,7 +63,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".BaseActivity"
+            android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.BaseActivity"
             android:exported="true"
             android:label="@string/app_name"
             android:screenOrientation="portrait"

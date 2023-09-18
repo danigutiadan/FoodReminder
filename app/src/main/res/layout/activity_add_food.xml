@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".features.add_food.ui.AddFoodActivity">
+    tools:context="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.AddFoodActivity">
 
     <fragment
         android:id="@+id/addFoodFragment"
-        android:name="com.danigutiadan.foodreminder.features.add_food.ui.AddFoodFragment"
+        android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.AddFoodFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

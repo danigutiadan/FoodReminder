@@ -6,7 +6,7 @@
 
     <fragment
         android:id="@+id/dashboard_navigation_home"
-        android:name="com.danigutiadan.foodreminder.features.dashboard.home.ui.HomeFragment"
+        android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.dashboard.home.ui.HomeFragment"
         android:label="fragment_home" >
         <action
             android:id="@+id/action_dashboard_navigation_home_to_addFoodFragment"
@@ -18,11 +18,11 @@
     </fragment>
     <fragment
         android:id="@+id/dashboard_navigation_profile"
-        android:name="com.danigutiadan.foodreminder.features.dashboard.profile.ui.ProfileFragment"
+        android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.dashboard.profile.ui.ProfileFragment"
         android:label="fragment_profile" />
     <fragment
         android:id="@+id/addFoodFragment"
-        android:name="com.danigutiadan.foodreminder.features.add_food.ui.AddFoodFragment"
+        android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.AddFoodFragment"
         android:label="AddFoodFragment" />
 
 

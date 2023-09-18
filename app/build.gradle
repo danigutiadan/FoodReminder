@@ -5,13 +5,14 @@ plugins {
     id("com.google.dagger.hilt.android")
     id 'androidx.navigation.safeargs'// add here.
 }
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
-    namespace 'com.danigutiadan.foodreminder'
+    namespace 'com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.danigutiadan.foodreminder"
+        applicationId "com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder"
         minSdk 26
         targetSdk 33
         versionCode 1
@@ -82,7 +83,6 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:2.3.2"
 
     //Firebase
-    implementation platform('com.google.firebase:firebase-bom:31.5.0')
     implementation 'com.google.firebase:firebase-analytics-ktx'
 
     //Hilt
@@ -99,6 +99,7 @@ dependencies {
     //Auth
     // Import the BoM for the Firebase platform
     implementation platform("com.google.firebase:firebase-bom:32.0.0")
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
 
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
