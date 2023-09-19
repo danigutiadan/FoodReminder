@@ -18,7 +18,7 @@ interface FoodRepository {
         expiryDate: Date,
         daysBeforeExpiration: Int,
         foodImageUrl: String
-    ): Flow<Response<Unit>>
+    ): Flow<Response<Long>>
 
     fun updateFood(
         id: Int?,

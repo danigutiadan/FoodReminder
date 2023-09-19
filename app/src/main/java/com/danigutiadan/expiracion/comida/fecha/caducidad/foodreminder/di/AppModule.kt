@@ -1,6 +1,8 @@
 package com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.di
 
+import android.app.AlarmManager
 import android.app.Application
+import android.content.Context
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.FoodReminderNavigator
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.Preferences
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.api.ApiService
@@ -85,4 +87,8 @@ object AppModule {
     @Singleton
     @Provides
     fun provideNavigator(app: Application): FoodReminderNavigator = FoodReminderNavigator(app)
+
+    @Singleton
+    @Provides
+    fun provideAlarmManager(app: Application) = app.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 }

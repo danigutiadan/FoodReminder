@@ -15,5 +15,5 @@ class SaveFoodUseCase @Inject constructor(private val foodRepository: FoodReposi
         daysBeforeExpiration: Int,
         foodType: Int,
         foodImageUrl: String
-    ): Flow<Response<Unit>> = foodRepository.saveFood(name, quantity, foodType, expiryDate, daysBeforeExpiration, foodImageUrl)
+    ): Flow<Response<Long>> = foodRepository.saveFood(name, quantity, foodType, expiryDate, daysBeforeExpiration, foodImageUrl)
 }

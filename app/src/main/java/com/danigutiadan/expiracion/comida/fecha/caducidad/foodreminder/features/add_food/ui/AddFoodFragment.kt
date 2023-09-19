@@ -1,6 +1,8 @@
 package com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,20 +12,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.BaseFragment
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.R
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.AddFoodScreen
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.notifications.FoodNotification
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.Response
 import com.google.zxing.integration.android.IntentIntegrator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.Date
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class AddFoodFragment : BaseFragment() {
     private val viewModel: AddFoodViewModel by viewModels()
     private val doClosePictureDialog = MutableStateFlow(false)
+    @Inject
+    lateinit var alarmManager: AlarmManager
 
 
     @SuppressLint("SuspiciousIndentation")
@@ -33,6 +43,7 @@ class AddFoodFragment : BaseFragment() {
     ): View {
         // Inflate the layout for this fragment
         viewModel.getAllFoodTypes()
+        createNotification()
 
         return ComposeView(requireContext()).apply {
             setContent {
@@ -47,6 +58,7 @@ class AddFoodFragment : BaseFragment() {
                 val isFoodTypeError: Boolean by viewModel.isFoodTypeError.collectAsState()
                 val isExpiryDateError: Boolean by viewModel.isExpiryDateError.collectAsState()
                 val isDaysBeforeExpirationError: Boolean by viewModel.isDaysBeforeExpirationError.collectAsState()
+                val isExpiryDateEarlierThanToday: Boolean by viewModel.isExpiryDateEarlierThanToday.collectAsState()
                 val selectedFoodType: FoodType? by viewModel.foodType.collectAsState()
                 val isFoodAddedSuccessfully: Boolean by viewModel.isFoodAddedSuccessfully.collectAsState()
                 AddFoodScreen(
@@ -111,7 +123,8 @@ class AddFoodFragment : BaseFragment() {
                     isExpiryDateError = isExpiryDateError,
                     isDaysBeforeExpirationError = isDaysBeforeExpirationError,
                     selectedFoodType = selectedFoodType,
-                    isFoodAddedSuccessfully = isFoodAddedSuccessfully
+                    isFoodAddedSuccessfully = isFoodAddedSuccessfully,
+                    isExpiryDateEarlierThanToday = isExpiryDateEarlierThanToday
                 )
             }
         }
@@ -119,11 +132,37 @@ class AddFoodFragment : BaseFragment() {
 
     }
 
+    private fun createNotification() {
+        lifecycleScope.launch {
+            viewModel.isFoodAddedSuccessfully.collect {isAddedSuccessfully ->
+                if (isAddedSuccessfully) {
+                    if(viewModel.isExpiryDateLaterThanTodayInFragment()) {
+                        val intent = Intent(context, FoodNotification::class.java)
+                        val pendingIntent = PendingIntent.getBroadcast(context, viewModel.foodAddedId.value, intent, PendingIntent.FLAG_IMMUTABLE)
+
+                        // Configura la alarma
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + getFoodNotificationDate(), pendingIntent)
+
+                    }
+
+                }
+            }
+        }
+    }
+
+    private fun getFoodNotificationDate(): Long {
+        val foodDaysBeforeExpirationNotification = viewModel.daysBeforeExpiration.value.toInt()
+        val calendar = Calendar.getInstance()
+        calendar.time = viewModel.getCorrectExpiryDate()
+        calendar.add(Calendar.DAY_OF_YEAR, - foodDaysBeforeExpirationNotification)
+        return calendar.timeInMillis - Calendar.getInstance().timeInMillis
+    }
+
     private fun initiateScan() {
         // Dentro de tu función onCreate, onCreateView o donde sea apropiado
         val integrator = IntentIntegrator.forSupportFragment(this)
         integrator.setDesiredBarcodeFormats(IntentIntegrator.ALL_CODE_TYPES)
-        integrator.setPrompt("Escanea un código de barras")
+        integrator.setPrompt(context?.getString(R.string.scan_barcode))
         integrator.setCameraId(0) // Usa la cámara trasera
         integrator.setBeepEnabled(false) // Desactiva el sonido de escaneo
         integrator.setOrientationLocked(true) // Permite que la orientación cambie durante el escaneo

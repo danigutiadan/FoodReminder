@@ -72,6 +72,10 @@
     <string name="sort_by">Ordenar por</string>
     <string name="filter">Filtrar</string>
 
+    <string name="food_expiration_notification_title">Caducidad de alimentos</string>
+
+    <string name="scan_barcode">Escanea un código de barras</string>
+
 
 
 

@@ -43,8 +43,8 @@ class FoodDataSource @Inject constructor(
     ) = flow {
         emit(Response.Loading)
         try {
-            db.foodDao().insertFood(food)
-            emit(Response.EmptySuccess)
+            val foodInsertedId = db.foodDao().insertFood(food)
+            emit(Response.Success(foodInsertedId))
         } catch (e: java.lang.Exception) {
             emit(Response.Error(e))
         }

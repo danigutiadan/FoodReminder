@@ -1,5 +1,8 @@
 package com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.dashboard.home.ui
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,18 +19,25 @@ import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.data.model.FoodOrder
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.data.model.FoodStatus
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.notifications.FoodNotification
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.StringUtils
 import dagger.hilt.android.AndroidEntryPoint
-import java.lang.NullPointerException
+import java.lang.Exception
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeFragment : BaseFragment() {
     private val homeViewModel: HomeViewModel by viewModels()
 
+    @Inject
+    lateinit var alarmManager: AlarmManager
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+
+
         // Inflate the layout for this fragment
         setCollectors()
         return ComposeView(requireContext()).apply {
@@ -51,6 +61,7 @@ class HomeFragment : BaseFragment() {
                     },
                     onDeleteButtonPressed = {
                         homeViewModel.deleteFoodFromList(it)
+                        deleteFoodNotification(it.food.id)
                     },
                     onSearchFoodChanged = {
                         homeViewModel.onSearchFoodChanged(it)
@@ -72,6 +83,16 @@ class HomeFragment : BaseFragment() {
                     )
                 )
             }
+        }
+    }
+
+    private fun deleteFoodNotification(id: Int?) {
+        id?.let {
+            try {
+                val intent = Intent(context, FoodNotification::class.java)
+                alarmManager.cancel(PendingIntent.getBroadcast(context, it, intent, PendingIntent.FLAG_IMMUTABLE))
+            } catch (_: Exception) {}
+
         }
     }
 

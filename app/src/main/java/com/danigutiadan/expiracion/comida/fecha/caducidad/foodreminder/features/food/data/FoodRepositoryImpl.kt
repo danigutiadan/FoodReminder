@@ -7,6 +7,7 @@ import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.FoodRepository
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.Response
 import kotlinx.coroutines.flow.Flow
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -24,7 +25,7 @@ class FoodRepositoryImpl @Inject constructor(private val foodDataSource: FoodDat
         expiryDate: Date,
         daysBeforeExpiration: Int,
         foodImageUrl: String
-    ): Flow<Response<Unit>> {
+    ): Flow<Response<Long>> {
         val food = Food(
             name = name,
             quantity = quantity,

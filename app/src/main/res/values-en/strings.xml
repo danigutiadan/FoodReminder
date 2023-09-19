@@ -68,6 +68,11 @@
     <string name="sort_by">Sort By</string>
     <string name="filter">Filter</string>
 
+    <string name="food_expiration_notification_title">Food expiration</string>
+
+    <string name="scan_barcode">Scan a barcode</string>
+
+
 
 
 

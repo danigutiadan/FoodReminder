@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/editFoodFragment"
-        android:name="com.danigutiadan.foodreminder.features.edit_food.ui.EditFoodFragment"
+        android:name="com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.edit_food.ui.EditFoodFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

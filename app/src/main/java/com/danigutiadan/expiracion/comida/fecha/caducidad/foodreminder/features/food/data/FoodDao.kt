@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.Flow
 interface FoodDao {
 
     @Insert
-    fun insertFood(food: Food)
+    fun insertFood(food: Food): Long
 
     @Update
     fun updateFood(food: Food)
@@ -67,10 +67,10 @@ interface FoodDao {
         if(foodOrder != null) {
             when(foodOrder) {
                 FoodOrder.FOOD_STATUS_ASC -> {
-                    queryBuilder.append(" ORDER BY food.food_status_int ASC")
+                    queryBuilder.append(" ORDER BY food.food_expiry_date ASC")
                 }
                 FoodOrder.FOOD_STATUS_DESC -> {
-                    queryBuilder.append(" ORDER BY food.food_status_int DESC")
+                    queryBuilder.append(" ORDER BY food.food_expiry_date DESC")
                 }
             }
         }

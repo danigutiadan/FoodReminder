@@ -97,7 +97,8 @@ fun AddFoodScreen(
     isExpiryDateError: Boolean,
     isDaysBeforeExpirationError: Boolean,
     selectedFoodType: FoodType?,
-    isFoodAddedSuccessfully: Boolean
+    isFoodAddedSuccessfully: Boolean,
+    isExpiryDateEarlierThanToday: Boolean
 ) {
     val scope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
@@ -272,16 +273,21 @@ fun AddFoodScreen(
                         })
                 }
 
-                Text(text = stringResource(id = R.string.notification_days_prompt))
-                Spacer(modifier = Modifier.height(5.dp))
-                AddTimeLeftTextField(
-                    input = daysBeforeExpiration,
-                    onValueChanged = { onDaysBeforeExpiration(it) },
-                    onDaysBeforeExpirationPlusPressed = { onDaysBeforeExpirationPlusPressed() },
-                    onDaysBeforeExpirationMinusPressed = { onDaysBeforeExpirationMinusPressed() },
-                    isDaysBeforeExpirationError = isDaysBeforeExpirationError
-                )
+                if(isExpiryDateEarlierThanToday.not()) {
+                    Text(text = stringResource(id = R.string.notification_days_prompt))
+                    Spacer(modifier = Modifier.height(5.dp))
+                    AddTimeLeftTextField(
+                        input = daysBeforeExpiration,
+                        onValueChanged = { onDaysBeforeExpiration(it) },
+                        onDaysBeforeExpirationPlusPressed = { onDaysBeforeExpirationPlusPressed() },
+                        onDaysBeforeExpirationMinusPressed = { onDaysBeforeExpirationMinusPressed() },
+                        isDaysBeforeExpirationError = isDaysBeforeExpirationError
+                    )
+                }
 
+
+                Spacer(modifier = Modifier.height(12.dp))
+                FoodDatesError(isExpiryDateEarlierThanToday)
             }
 
             if(isFoodAddedSuccessfully) {
@@ -322,6 +328,13 @@ fun AddFoodScreen(
             }
         }
 
+}
+
+@Composable
+fun FoodDatesError(isExpiryDateEarlierThanToday: Boolean) {
+    if(isExpiryDateEarlierThanToday) {
+        Text("* El alimento que has introducido ya esta caducado", color = Color(0xFFF1B81A))
+    }
 }
 
 @Composable
@@ -509,7 +522,7 @@ fun AddFoodQuantityTextField(
                 val text: String = if (input.isNotBlank()) {
                     if (input.toInt() == 1) " ${stringResource(id = R.string.unit)}" else " ${stringResource(id = R.string.units)}"
                 } else
-                    " ${stringResource(id = R.string.units)}"
+                    "0 ${stringResource(id = R.string.units)}"
 
                 Text(text = text, fontSize = 18.sp)
             }
@@ -638,6 +651,7 @@ fun PreviewAddFoodScreen() {
         true,
         false,
         FoodType(1, "Legumbres"),
-        false
+        false,
+        true
     )
 }

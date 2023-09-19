@@ -1,6 +1,9 @@
 package com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder
 
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.notifications.FoodNotification
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.compose.setContent
@@ -20,6 +23,7 @@ import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.ui.FoodTypeViewModel
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.onboarding.ui.OnboardingActivity
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 import kotlin.concurrent.thread
 
 @AndroidEntryPoint
@@ -59,6 +63,9 @@ class MainActivity : BaseActivity() {
         R.string.category_baby_foods,
     )
 
+    @Inject
+    lateinit var alarmManager: AlarmManager
+
     @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,6 +75,8 @@ class MainActivity : BaseActivity() {
             foodTypeViewModel.insertFoodType(FoodType(name = getString(foodType)))
             preferences.isDatabaseInitialized = true
         }
+
+
 
         foodTypeViewModel.getAllFoodTypes()
 

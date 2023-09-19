@@ -1,5 +1,8 @@
 package com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.edit_food.ui
 
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,20 +12,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.BaseFragment
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.edit_food.ui.screens.EditFoodScreen
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.data.model.FoodInfo
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.notifications.FoodNotification
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.Response
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.Date
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class EditFoodFragment : BaseFragment() {
     private var food: FoodInfo? = null
     private val viewModel: EditFoodViewModel by viewModels()
     private val doClosePictureDialog = MutableStateFlow(false)
+
+    @Inject
+    lateinit var alarmManager: AlarmManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,8 +62,10 @@ class EditFoodFragment : BaseFragment() {
                         //initiateScan()
                     },
                     saveFoodListener = {
-                        if(viewModel.allFieldsFilled())
+                        if(viewModel.allFieldsFilled()) {
                             viewModel.updateFood()
+                            updateNotification()
+                        }
                     },
                     onExpiryDateSelected = {
                         viewModel.onExpiryDateSelected(it)
@@ -110,6 +123,33 @@ class EditFoodFragment : BaseFragment() {
                 )
             }
         }
+
+    }
+
+    private fun updateNotification() {
+        lifecycleScope.launch {
+            viewModel.isFoodEditedSuccessfully.collect {isEditedSuccessfully ->
+                if (isEditedSuccessfully) {
+                    viewModel.foodInfo.value?.let {foodInfo ->
+                    foodInfo.food.id?.let {id ->
+
+                        val intent = Intent(context, FoodNotification::class.java)
+                        val pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_IMMUTABLE)
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + getFoodNotificationDate(), pendingIntent)
+
+                    }
+                    }
+                }
+                }
+            }
+        }
+
+    private fun getFoodNotificationDate(): Long {
+        val foodDaysBeforeExpirationNotification = viewModel.daysBeforeExpiration.value.toInt()
+        val calendar = Calendar.getInstance()
+        calendar.time = viewModel.getCorrectExpiryDate()
+        calendar.add(Calendar.DAY_OF_YEAR, - foodDaysBeforeExpirationNotification)
+        return calendar.timeInMillis - Calendar.getInstance().timeInMillis
     }
 
     private fun getFoodInfo() {

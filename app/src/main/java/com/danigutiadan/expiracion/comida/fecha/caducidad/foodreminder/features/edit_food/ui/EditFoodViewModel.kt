@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -72,6 +73,9 @@ class EditFoodViewModel @Inject constructor(
 
     private val _foodInfo = MutableStateFlow<FoodInfo?>(null)
     val foodInfo: StateFlow<FoodInfo?> = _foodInfo
+
+    private val _isFoodEditedSuccessfully = MutableStateFlow(false)
+    val isFoodEditedSuccessfully: StateFlow<Boolean> = _isFoodEditedSuccessfully
 
     private val _foodTypeByBarcodeState =
         MutableStateFlow<Response<BarcodeFoodResponse?>>(Response.Loading)
@@ -158,8 +162,22 @@ class EditFoodViewModel @Inject constructor(
         )
             .onStart { }
             .onEach {
+                if(it is Response.EmptySuccess) {
+                    _isFoodEditedSuccessfully.value = true
+                }
+
             }.launchIn(viewModelScope)
 
+    }
+
+    fun getCorrectExpiryDate(): Date {
+        val calendar = Calendar.getInstance()
+        calendar.time = _expiryDate.value!!
+        val correctDate = Calendar.getInstance()
+        correctDate.set(Calendar.DAY_OF_MONTH,  calendar.get(Calendar.DAY_OF_MONTH))
+        correctDate.set(Calendar.MONTH, calendar.get(Calendar.MONTH))
+        correctDate.set(Calendar.YEAR, calendar.get(Calendar.YEAR))
+        return correctDate.time
     }
 
     fun allFieldsFilled(): Boolean {
