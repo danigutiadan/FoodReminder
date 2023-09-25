@@ -35,4 +35,6 @@ class FoodTypeViewModel @Inject constructor(
             .onEach { _foodTypeState.value = it }
             .launchIn(viewModelScope)
     }
+
+
 }

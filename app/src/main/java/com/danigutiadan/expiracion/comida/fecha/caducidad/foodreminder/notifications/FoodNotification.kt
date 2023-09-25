@@ -2,11 +2,13 @@ package com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.notifica
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.MainActivity
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.R
 
 class FoodNotification : BroadcastReceiver() {
@@ -34,12 +36,20 @@ class FoodNotification : BroadcastReceiver() {
             notificationManager.createNotificationChannel(channel)
         }
 
+        val contentIntent = PendingIntent.getActivity(
+            context, 0,
+            Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT
+        )
+
+
         // Crear el contenido de la notificación
         val builder = NotificationCompat.Builder(context, "1")
-            .setSmallIcon(R.drawable.ic_logo) // Icono pequeño de la notificación
+            .setSmallIcon(R.drawable.ic_alarm) // Icono pequeño de la notificación
             .setContentTitle("¡Tienes alimentos cerca de caducarse!")
             .setStyle(NotificationCompat.BigTextStyle().bigText("Hora de revisar tus alimentos. ¡Consulta en FoodReminder ahora para evitar desperdicios!"))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .setContentIntent(contentIntent)
+            .setAutoCancel(true)
 
         // Mostrar la notificación
         notificationManager.notify(notificationId, builder.build())

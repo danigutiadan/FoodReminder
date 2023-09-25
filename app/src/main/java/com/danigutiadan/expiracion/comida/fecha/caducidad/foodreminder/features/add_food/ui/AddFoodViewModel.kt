@@ -3,9 +3,14 @@ package com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.FoodUtils
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.FoodUtils.isExpiryDateLaterThanToday
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.FoodUtils.isExpiryDateTheSameAsToday
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.FoodUtils.isExpiryDateTheSameAsTomorrow
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.data.model.BarcodeFoodResponse
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.GetFoodInfoByBarcodeUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.SaveFoodUseCase
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.UpdateFoodStatusUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.usecases.GetAllFoodTypesUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.Response
@@ -19,6 +24,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import java.lang.NumberFormatException
+import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
@@ -69,8 +76,8 @@ class AddFoodViewModel @Inject constructor(
     private val _foodType = MutableStateFlow<FoodType?>(null)
     val foodType: StateFlow<FoodType?> = _foodType
 
-    private val _daysBeforeExpiration = MutableStateFlow("0")
-    val daysBeforeExpiration: StateFlow<String> = _daysBeforeExpiration
+    private val _daysBeforeExpiration = MutableStateFlow(1)
+    val daysBeforeExpiration: StateFlow<Int> = _daysBeforeExpiration
 
     private val _foodImageUrl = MutableStateFlow("")
     val foodImageUrl: StateFlow<String> = _foodImageUrl
@@ -81,8 +88,23 @@ class AddFoodViewModel @Inject constructor(
     private val _isFoodAddedSuccessfully = MutableStateFlow(false)
     val isFoodAddedSuccessfully: StateFlow<Boolean> = _isFoodAddedSuccessfully
 
+    private val _shouldShowInterstitialAd = MutableStateFlow(false)
+    val shouldShowInterstitialAd: StateFlow<Boolean> = _shouldShowInterstitialAd
+
     private val _foodAddedId = MutableStateFlow(0)
     val foodAddedId: StateFlow<Int> = _foodAddedId
+
+    private val _foodsAddedForInterstitial = MutableStateFlow(0)
+    val foodsAddedForInterstitial: StateFlow<Int> =_foodsAddedForInterstitial
+
+    private val _shouldShowSuccessfullySnackBar = MutableStateFlow(false)
+    val shouldShowSuccessfullySnackBar: StateFlow<Boolean> = _shouldShowSuccessfullySnackBar
+
+    private val _isDaysBeforeNotificationEnabled = MutableStateFlow(false)
+    val isDaysBeforeNotificationEnabled: StateFlow<Boolean> = _isDaysBeforeNotificationEnabled
+
+    private val _dateBeforeExpirationWarning: MutableStateFlow<DateBeforeExpirationWarning?> = MutableStateFlow(null)
+    val dateBeforeExpirationWarning: StateFlow<DateBeforeExpirationWarning?> = _dateBeforeExpirationWarning
 
     fun getAllFoodTypes() {
         getAllFoodTypesUseCase.execute()
@@ -109,7 +131,9 @@ class AddFoodViewModel @Inject constructor(
 
     fun onExpiryDateSelected(date: Date) {
         _expiryDate.value = date
+        _isDaysBeforeNotificationEnabled.value = true
         checkIfExpiryDateIsEarlierThanToday()
+        _daysBeforeExpiration.value = 1
     }
 
     fun onFoodBarcodeScanned(barcode: String) {
@@ -130,9 +154,23 @@ class AddFoodViewModel @Inject constructor(
     }
 
 
-    fun onDaysBeforeExpiration(daysBeforeExpired: String) {
+    fun onDaysBeforeExpiration(daysBeforeExpired: Int) {
         _daysBeforeExpiration.value = daysBeforeExpired
     }
+
+    fun updateFoodTypeStatus(){
+
+    }
+
+    fun showFoodAddedSuccessfullySnackBar() {
+        _shouldShowSuccessfullySnackBar.value = true
+    }
+
+    fun hideFoodAddedSuccessfullySnackBar() {
+        _shouldShowSuccessfullySnackBar.value = false
+    }
+
+
 
     fun onQuantityPlusPressed() {
         _foodQuantity.value =
@@ -145,14 +183,27 @@ class AddFoodViewModel @Inject constructor(
     }
 
     fun onDaysBeforeExpirationPlusPressed() {
-        _daysBeforeExpiration.value =
-            if (_daysBeforeExpiration.value.isEmpty()) "1" else (_daysBeforeExpiration.value.toInt() + 1).toString()
+        val maximumDays = maximumDaysBeforeNotification()
+        when  {
+            _daysBeforeExpiration.value >= maximumDays -> _daysBeforeExpiration.value = maximumDays
+            _daysBeforeExpiration.value < 1 -> _daysBeforeExpiration.value = 1
+            else -> _daysBeforeExpiration.value += 1
+        }
     }
 
     fun onDaysBeforeExpirationMinusPressed() {
-        _daysBeforeExpiration.value =
-            if (_daysBeforeExpiration.value.isEmpty()) "" else if (_daysBeforeExpiration.value == "0") "0" else (_daysBeforeExpiration.value.toInt() - 1).toString()
+        when  {
+            _daysBeforeExpiration.value <= 1 -> _daysBeforeExpiration.value = 1
+            else -> _daysBeforeExpiration.value -= 1
+        }
+    }
 
+
+    private fun maximumDaysBeforeNotification(): Int {
+        val localDate1 = Date().toInstant().atZone(ZoneId.systemDefault()).toLocalDate()
+        val localDate2 = _expiryDate.value?.toInstant()?.atZone(ZoneId.systemDefault())?.toLocalDate()
+
+        return (ChronoUnit.DAYS.between(localDate1, localDate2) - 1).toInt()
     }
 
     fun saveFood() {
@@ -161,7 +212,7 @@ class AddFoodViewModel @Inject constructor(
             quantity = _foodQuantity.value.toInt(),
             foodType = _foodType.value?.id!!,
             expiryDate = getCorrectExpiryDate(),
-            daysBeforeExpiration = if(_daysBeforeExpiration.value.isNotBlank())_daysBeforeExpiration.value.toInt() else 0,
+            daysBeforeExpiration = _daysBeforeExpiration.value,
             foodImageUrl = _foodImageUrl.value
         )
             .onStart { }
@@ -170,12 +221,15 @@ class AddFoodViewModel @Inject constructor(
                     _foodAddedId.value = response.data.toInt()
                     _isFoodAddedSuccessfully.value = true
                     resetAllFields()
+                    manageInterstitial()
+                    showFoodAddedSuccessfullySnackBar()
                 }
             }.launchIn(viewModelScope)
 
+
     }
 
-    fun getCorrectExpiryDate(): Date {
+     fun getCorrectExpiryDate(): Date {
         val calendar = Calendar.getInstance()
         calendar.time = _expiryDate.value!!
         val correctDate = Calendar.getInstance()
@@ -185,47 +239,50 @@ class AddFoodViewModel @Inject constructor(
         return correctDate.time
     }
 
+
+    private fun manageInterstitial() {
+        _foodsAddedForInterstitial.value += 1
+        if (_foodsAddedForInterstitial.value % 4 == 0) {
+            _shouldShowInterstitialAd.value = true
+        }
+    }
+
+    fun onInterstitialClosed() {
+        _foodsAddedForInterstitial.value = 0
+        _shouldShowInterstitialAd.value = false
+    }
+
     private fun resetAllFields() {
         _foodName.value = ""
         _foodQuantity.value = "0"
         _foodType.value = null
         _expiryDate.value = null
-        _daysBeforeExpiration.value = "0"
+        _daysBeforeExpiration.value = 1
         _foodImageUrl.value = ""
         _isExpiryDateEarlierThanToday.value = false
-        android.os.Handler().postDelayed( {
           _isFoodAddedSuccessfully.value = false
-        }, 5000)
-
-
-
     }
 
-    private fun isExpiryDateLaterThanToday(): Boolean {
-        return Date().before(_expiryDate.value)
-    }
 
-    fun isExpiryDateLaterThanTodayInFragment(): Boolean {
-        return Date().before(expiryDate.value)
-    }
 
-    private fun isExpiryDateTheSameAsToday(): Boolean {
-        val cal1 = Calendar.getInstance()
-        cal1.time = Date()
 
-        val cal2 = Calendar.getInstance()
-        cal2.time = _expiryDate.value!!
-
-        val sameDay = cal1.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH)
-        val sameMonth = cal1.get(Calendar.MONTH) == cal2.get(Calendar.MONTH)
-        val sameYear = cal1.get(Calendar.YEAR) == cal2.get(Calendar.YEAR)
-
-        return sameDay && sameMonth && sameYear
-    }
 
     private fun checkIfExpiryDateIsEarlierThanToday() {
         _isExpiryDateEarlierThanToday.value =
-            isExpiryDateLaterThanToday().not() || isExpiryDateTheSameAsToday()
+            isExpiryDateLaterThanToday(_expiryDate.value!!).not() ||
+            FoodUtils.isExpiryDateTheSameAsToday(_expiryDate.value!!) || FoodUtils.isExpiryDateTheSameAsTomorrow(_expiryDate.value!!)
+
+        _dateBeforeExpirationWarning.value = when {
+            isExpiryDateTheSameAsToday(_expiryDate.value!!) -> DateBeforeExpirationWarning.EXPIRATES_TODAY
+            isExpiryDateLaterThanToday(_expiryDate.value!!).not() -> DateBeforeExpirationWarning.EXPIRATED
+            isExpiryDateTheSameAsTomorrow(_expiryDate.value!!) -> DateBeforeExpirationWarning.EXPIRATES_TOMORROW
+            else -> null
+        }
+    }
+
+    fun shouldShowNotification(): Boolean {
+        return isExpiryDateLaterThanToday(_expiryDate.value!!) &&
+                !isExpiryDateTheSameAsToday(_expiryDate.value!!) && !isExpiryDateTheSameAsTomorrow(_expiryDate.value!!)
     }
 
 
@@ -235,7 +292,7 @@ class AddFoodViewModel @Inject constructor(
         _isFoodTypeError.value = _foodType.value?.id == null
         _isExpiryDateError.value = _expiryDate.value == null
         if ((_isExpiryDateEarlierThanToday.value).not()) {
-            _isDaysBeforeExpirationError.value = _daysBeforeExpiration.value.toInt() < 1
+            _isDaysBeforeExpirationError.value = _daysBeforeExpiration.value < 1
         }
 
         return _foodName.value.isNotBlank()
@@ -251,4 +308,8 @@ class AddFoodViewModel @Inject constructor(
             }
 
     }
+}
+
+enum class DateBeforeExpirationWarning {
+    EXPIRATED, EXPIRATES_TODAY, EXPIRATES_TOMORROW
 }

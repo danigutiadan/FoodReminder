@@ -10,5 +10,7 @@ import java.io.Serializable
 data class FoodType(
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null,
+    @ColumnInfo(name = "food_type_name_resource")
+    var foodTypeNameResource: String? = null,
     @ColumnInfo(name = "food_type_name")
-    var name: String): Serializable
+    var foodTypeName: String? = null): Serializable

@@ -30,17 +30,21 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.R
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.FoodUtils.orderedAlphabetic
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.DateBeforeExpirationWarning
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.components.CustomDatePickerDialog
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.AddFoodNameTextField
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.AddFoodQuantityTextField
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.AddTimeLeftTextField
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.ExpiryDateText
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.FoodDatesError
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.FoodImage
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.FoodTypeDropdownMenu
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
@@ -70,8 +74,8 @@ fun EditFoodScreen(
     onFoodQuantityChanged: (String) -> Unit,
     onFoodNameChanged: (String) -> Unit,
     dateSelected: Date?,
-    daysBeforeExpiration: String,
-    onDaysBeforeExpiration: (String) -> Unit,
+    daysBeforeExpiration: Int,
+    onDaysBeforeExpiration: (Int) -> Unit,
     onQuantityPlusPressed: () -> Unit,
     onQuantityMinusPressed: () -> Unit,
     onDaysBeforeExpirationPlusPressed: () -> Unit,
@@ -82,7 +86,10 @@ fun EditFoodScreen(
     isFoodTypeError: Boolean,
     isExpiryDateError: Boolean,
     isDaysBeforeExpirationError: Boolean,
-    selectedFoodType: FoodType?
+    selectedFoodType: FoodType?,
+    isDaysBeforeNotificationEnabled: Boolean,
+    isExpiryDateEarlierThanToday: Boolean,
+    dateBeforeExpirationWarning: DateBeforeExpirationWarning?
 ) {
     val scope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
@@ -227,7 +234,7 @@ fun EditFoodScreen(
                 when (foodTypeListState) {
                     is Response.Success -> {
                         FoodTypeDropdownMenu(
-                            foodTypeList = foodTypeListState.data,
+                            foodTypeList = foodTypeListState.data.orderedAlphabetic(LocalContext.current),
                             onFoodTypeSelected = onFoodTypeSelected,
                             isFoodTypeError,
                             selectedFoodType = selectedFoodType
@@ -254,18 +261,24 @@ fun EditFoodScreen(
                         },
                         onDismissRequest = {
                             showDatePicker.value = false
-                        })
+                        },
+                    dateSelected = dateSelected)
+                }
+                if(isExpiryDateEarlierThanToday.not()) {
+                    Text(text = stringResource(id = R.string.notification_days_prompt))
+                    Spacer(modifier = Modifier.height(5.dp))
+                    AddTimeLeftTextField(
+                        input = daysBeforeExpiration.toString(),
+                        onValueChanged = {days -> onDaysBeforeExpiration(days.toInt()) },
+                        onDaysBeforeExpirationPlusPressed = { onDaysBeforeExpirationPlusPressed() },
+                        onDaysBeforeExpirationMinusPressed = { onDaysBeforeExpirationMinusPressed() },
+                        isDaysBeforeExpirationError = isDaysBeforeExpirationError,
+                        isDaysBeforeNotificationEnabled = isDaysBeforeNotificationEnabled
+                    )
                 }
 
-                Text(text = stringResource(id = R.string.notification_days_prompt))
-                Spacer(modifier = Modifier.height(5.dp))
-                AddTimeLeftTextField(
-                    input = daysBeforeExpiration,
-                    onValueChanged = { onDaysBeforeExpiration(it) },
-                    onDaysBeforeExpirationPlusPressed = { onDaysBeforeExpirationPlusPressed() },
-                    onDaysBeforeExpirationMinusPressed = { onDaysBeforeExpirationMinusPressed() },
-                    isDaysBeforeExpirationError = isDaysBeforeExpirationError
-                )
+                Spacer(modifier = Modifier.height(12.dp))
+                FoodDatesError(isExpiryDateEarlierThanToday, dateBeforeExpirationWarning)
 
             }
         }
@@ -327,7 +340,7 @@ fun PreviewAddFoodScreen() {
         {},
         {},
         Date(),
-        "0",
+        1,
         {},
         {},
         {},
@@ -339,6 +352,8 @@ fun PreviewAddFoodScreen() {
         true,
         true,
         false,
-        FoodType(1, "Legumbres")
-    )
+        FoodType(1, "Legumbres"),
+        false,
+    false,
+    null)
 }

@@ -9,6 +9,7 @@ import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.GetFoodInfoByBarcodeUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.GetFoodWithFiltersUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.SaveFoodUseCase
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.UpdateFoodStatusUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.UpdateFoodUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.repository.FoodTypeRepository
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.usecases.GetAllFoodTypesUseCase
@@ -101,5 +102,9 @@ object UseCaseModule {
     fun provideUpdateFoodUseCase(foodRepository: FoodRepository) =
         UpdateFoodUseCase(foodRepository = foodRepository)
 
+    @Singleton
+    @Provides
+    fun provideUpdateFoodStatusUseCase(foodRepository: FoodRepository) =
+        UpdateFoodStatusUseCase(foodRepository = foodRepository)
 
 }

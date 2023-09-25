@@ -38,6 +38,7 @@ import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.data.model.FoodStatus
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.DateUtils.formatDateToString
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.StringUtils.getFoodTypeName
 import java.util.Date
 
 @Composable
@@ -92,13 +93,13 @@ fun FoodItem(
                         color = Color.White
                     )
                     Text(
-                        text = "${stringResource(id = R.string.expiration_date)}: ${formatDateToString(food.food.expiryDate)}",
+                        text = "${stringResource(id = R.string.expiration_date)}: ${formatDateToString(food.food.expiryDate, LocalContext.current)}",
                         fontSize = 16.sp,
                         color = Color.White,
                         modifier = Modifier.padding(bottom = 5.dp)
                     )
                     Text(
-                        text = "${stringResource(id = R.string.food_type)}: ${food.foodType.name}",
+                        text = "${stringResource(id = R.string.food_type)}: ${getFoodTypeName(food.foodType)}",
                         fontSize = 16.sp,
                         color = Color.White,
                         modifier = Modifier.padding(bottom = 5.dp)

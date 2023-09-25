@@ -5,9 +5,9 @@ import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.data.model.FoodInfo
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.data.model.FoodOrder
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.FoodRepository
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.getFoodStatusByDate
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.Response
 import kotlinx.coroutines.flow.Flow
-import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
 
@@ -73,4 +73,16 @@ class FoodRepositoryImpl @Inject constructor(private val foodDataSource: FoodDat
 
     override fun deleteFood(food: Food): Flow<Response<Unit>> =
         foodDataSource.deleteFood(food)
+
+    override fun updateAllFoodStatus(foodList: List<FoodInfo>): Flow<Response<Unit>> {
+        //Update food list and update database
+        val updatedFoodList = mutableListOf<Food>()
+        foodList.forEach { food ->
+            val foodUpdated = food.food.apply {
+                foodStatus = getFoodStatusByDate(expiryDate)
+            }
+            updatedFoodList.add(foodUpdated)
+        }
+        return foodDataSource.doUpdateFoodList(updatedFoodList)
+    }
 }

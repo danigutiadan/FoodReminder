@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.ComposeView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.BaseFragment
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.DateBeforeExpirationWarning
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.edit_food.ui.screens.EditFoodScreen
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.data.model.FoodInfo
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
@@ -48,7 +49,7 @@ class EditFoodFragment : BaseFragment() {
                 val foodName: String by viewModel.foodName.collectAsState()
                 val foodQuantity: String by viewModel.foodQuantity.collectAsState()
                 val expiryDate: Date? by viewModel.expiryDate.collectAsState()
-                val daysBeforeExpiration: String by viewModel.daysBeforeExpiration.collectAsState()
+                val daysBeforeExpiration: Int by viewModel.daysBeforeExpiration.collectAsState()
                 val remoteImageUrl: String by viewModel.foodImageUrl.collectAsState()
                 val isNameError: Boolean by viewModel.isNameError.collectAsState()
                 val isQuantityError: Boolean by viewModel.isQuantityError.collectAsState()
@@ -56,6 +57,9 @@ class EditFoodFragment : BaseFragment() {
                 val isExpiryDateError: Boolean by viewModel.isExpiryDateError.collectAsState()
                 val isDaysBeforeExpirationError: Boolean by viewModel.isDaysBeforeExpirationError.collectAsState()
                 val selectedFoodType: FoodType? by viewModel.foodType.collectAsState()
+                val isDaysBeforeNotificationEnabled: Boolean by viewModel.isDaysBeforeNotificationEnabled.collectAsState()
+                val isExpiryDateEarlierThanToday: Boolean by viewModel.isExpiryDateEarlierThanToday.collectAsState()
+                val dateBeforeExpirationWarning: DateBeforeExpirationWarning? by viewModel.dateBeforeExpirationWarning.collectAsState()
                 EditFoodScreen(
                     backClickListener = { activity?.onBackPressed() },
                     barcodeClickListener = {
@@ -119,7 +123,10 @@ class EditFoodFragment : BaseFragment() {
                     isFoodTypeError = isFoodTypeError,
                     isExpiryDateError = isExpiryDateError,
                     isDaysBeforeExpirationError = isDaysBeforeExpirationError,
-                    selectedFoodType = selectedFoodType
+                    selectedFoodType = selectedFoodType,
+                    isDaysBeforeNotificationEnabled = isDaysBeforeNotificationEnabled,
+                    isExpiryDateEarlierThanToday = isExpiryDateEarlierThanToday,
+                    dateBeforeExpirationWarning = dateBeforeExpirationWarning
                 )
             }
         }
@@ -130,15 +137,29 @@ class EditFoodFragment : BaseFragment() {
         lifecycleScope.launch {
             viewModel.isFoodEditedSuccessfully.collect {isEditedSuccessfully ->
                 if (isEditedSuccessfully) {
-                    viewModel.foodInfo.value?.let {foodInfo ->
-                    foodInfo.food.id?.let {id ->
+                    if (viewModel.shouldShowNotification()) {
+                        viewModel.foodInfo.value?.let { foodInfo ->
+                            foodInfo.food.id?.let { id ->
+                                val intent = Intent(context, FoodNotification::class.java)
+                                val pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_IMMUTABLE)
+                                alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + getFoodNotificationDate(), pendingIntent)
+                            }
+                        }
+                    } else {
+                        viewModel.foodInfo.value?.let { foodInfo ->
+                            foodInfo.food.id?.let { id ->
+                                try {
+                                    val intent = Intent(context, FoodNotification::class.java)
+                                    val pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_IMMUTABLE)
+                                    alarmManager.cancel(pendingIntent)
 
-                        val intent = Intent(context, FoodNotification::class.java)
-                        val pendingIntent = PendingIntent.getBroadcast(context, id, intent, PendingIntent.FLAG_IMMUTABLE)
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + getFoodNotificationDate(), pendingIntent)
-
+                                } catch (e: Exception) {
+                                    e.printStackTrace()
+                                }
+                            }
+                        }
                     }
-                    }
+                    activity?.onBackPressed()
                 }
                 }
             }

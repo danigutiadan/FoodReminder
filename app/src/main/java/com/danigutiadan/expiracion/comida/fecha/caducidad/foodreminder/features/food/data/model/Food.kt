@@ -77,7 +77,7 @@ data class Food(
         val daysBeforeExpired = ChronoUnit.DAYS.between(todayDateInstant, expiryDateInstant)
         foodStatus = when {
             daysBeforeExpired >= 10L -> FoodStatus.FRESH
-            daysBeforeExpired in 5L..9L -> FoodStatus.ABOUT_TO_EXPIRE
+            daysBeforeExpired in 1L..9L -> FoodStatus.ABOUT_TO_EXPIRE
             else -> FoodStatus.ALMOST_EXPIRED
         }
 

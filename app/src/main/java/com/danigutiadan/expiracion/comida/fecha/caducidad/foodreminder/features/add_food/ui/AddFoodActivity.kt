@@ -9,6 +9,9 @@ import android.provider.MediaStore
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.BaseActivity
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.ads.loadInterstitial
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.ads.randomNumber
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.ads.showInterstitial
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.databinding.ActivityAddFoodBinding
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.onboarding.ui.MY_PERMISSIONS_REQUEST_CAMERA
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.onboarding.ui.READ_EXTERNAL_STORAGE_PERMISSION_CODE
@@ -28,6 +31,7 @@ class AddFoodActivity : BaseActivity() {
     private var currentTimeMillis = ""
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        loadInterstitial(this)
         binding = ActivityAddFoodBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
@@ -51,6 +55,15 @@ class AddFoodActivity : BaseActivity() {
             addFoodViewModel.imageUri = ImageUtils.takePictureFromCamera(this, currentTimeMillis)
         }
 
+
+    }
+
+    override fun onBackPressed() {
+        if(1 == randomNumber()) {
+            showInterstitial(this, onAdDismissed = { super.onBackPressed() })
+        } else {
+            super.onBackPressed()
+        }
 
     }
 

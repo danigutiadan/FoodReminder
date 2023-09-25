@@ -11,6 +11,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import java.util.Date
 import javax.inject.Inject
 
 class FoodDataSource @Inject constructor(
@@ -58,6 +59,19 @@ class FoodDataSource @Inject constructor(
         try {
             db.foodDao().updateFood(food)
             emit(Response.EmptySuccess)
+        } catch (e: java.lang.Exception) {
+            emit(Response.Error(e))
+        }
+
+    }.flowOn(Dispatchers.IO)
+
+    fun doUpdateFoodList(foodList: List<Food>
+    ): Flow<Response<Unit>> = flow {
+        emit(Response.Loading)
+        try {
+            db.foodDao().updateFoodList(foodList)
+            emit(Response.EmptySuccess)
+
         } catch (e: java.lang.Exception) {
             emit(Response.Error(e))
         }

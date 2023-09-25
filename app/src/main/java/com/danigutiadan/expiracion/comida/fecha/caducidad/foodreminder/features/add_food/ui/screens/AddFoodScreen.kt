@@ -44,6 +44,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -55,14 +56,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.R
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.ads.showInterstitial
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.FoodUtils.orderedAlphabetic
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.DateBeforeExpirationWarning
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.components.CustomDatePickerDialog
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.data.model.Food
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.onboarding.adduserinfo.ui.screens.AddProfileImageButtonSheetDialog
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.DateUtils.formatDateToString
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.Response
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.StringUtils
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.StringUtils.getFoodTypeName
 import com.dokar.sheets.BottomSheetLayout
 import com.dokar.sheets.BottomSheetState
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.Date
 
@@ -84,8 +92,8 @@ fun AddFoodScreen(
     onFoodQuantityChanged: (String) -> Unit,
     onFoodNameChanged: (String) -> Unit,
     dateSelected: Date?,
-    daysBeforeExpiration: String,
-    onDaysBeforeExpiration: (String) -> Unit,
+    daysBeforeExpiration: Int,
+    onDaysBeforeExpiration: (Int) -> Unit,
     onQuantityPlusPressed: () -> Unit,
     onQuantityMinusPressed: () -> Unit,
     onDaysBeforeExpirationPlusPressed: () -> Unit,
@@ -98,14 +106,21 @@ fun AddFoodScreen(
     isDaysBeforeExpirationError: Boolean,
     selectedFoodType: FoodType?,
     isFoodAddedSuccessfully: Boolean,
-    isExpiryDateEarlierThanToday: Boolean
+    isExpiryDateEarlierThanToday: Boolean,
+    shouldShowInterstitialAd: Boolean,
+    onInterstitialClosed: () -> Unit,
+    onSnackBarDisappeared: () -> Unit,
+    shouldShowSuccessfullySnackBar: Boolean,
+    isDaysBeforeNotificationEnabled: Boolean,
+    dateBeforeExpirationWarning: DateBeforeExpirationWarning?
 ) {
     val scope = rememberCoroutineScope()
     val interactionSource = remember { MutableInteractionSource() }
     Scaffold(topBar = {
         TopAppBar(
             navigationIcon = {
-                IconButton(onClick = { backClickListener() }) {
+                IconButton(onClick = {
+                    backClickListener() }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = "",
@@ -243,7 +258,7 @@ fun AddFoodScreen(
                 when (foodTypeListState) {
                     is Response.Success -> {
                         FoodTypeDropdownMenu(
-                            foodTypeList = foodTypeListState.data,
+                            foodTypeList = foodTypeListState.data.orderedAlphabetic(LocalContext.current),
                             onFoodTypeSelected = onFoodTypeSelected,
                             isFoodTypeError,
                             selectedFoodType = selectedFoodType
@@ -270,28 +285,36 @@ fun AddFoodScreen(
                         },
                         onDismissRequest = {
                             showDatePicker.value = false
-                        })
+                        },
+                    dateSelected = dateSelected
+                    )
                 }
 
                 if(isExpiryDateEarlierThanToday.not()) {
                     Text(text = stringResource(id = R.string.notification_days_prompt))
                     Spacer(modifier = Modifier.height(5.dp))
                     AddTimeLeftTextField(
-                        input = daysBeforeExpiration,
-                        onValueChanged = { onDaysBeforeExpiration(it) },
+                        input = daysBeforeExpiration.toString(),
+                        onValueChanged = { days -> onDaysBeforeExpiration(days.toInt()) },
                         onDaysBeforeExpirationPlusPressed = { onDaysBeforeExpirationPlusPressed() },
                         onDaysBeforeExpirationMinusPressed = { onDaysBeforeExpirationMinusPressed() },
-                        isDaysBeforeExpirationError = isDaysBeforeExpirationError
+                        isDaysBeforeExpirationError = isDaysBeforeExpirationError,
+                        isDaysBeforeNotificationEnabled = isDaysBeforeNotificationEnabled
                     )
                 }
 
 
                 Spacer(modifier = Modifier.height(12.dp))
-                FoodDatesError(isExpiryDateEarlierThanToday)
+                FoodDatesError(isExpiryDateEarlierThanToday, dateBeforeExpirationWarning)
             }
 
-            if(isFoodAddedSuccessfully) {
-                MySnackBar(message = stringResource(id = R.string.product_added), actionLabel = "")
+            if(shouldShowSuccessfullySnackBar) {
+                MySnackBar(message = stringResource(id = R.string.product_added), actionLabel = "", onDismiss = onSnackBarDisappeared)
+            }
+
+
+            if(shouldShowInterstitialAd) {
+                showInterstitial(LocalContext.current, onInterstitialClosed)
             }
         }
 
@@ -331,9 +354,17 @@ fun AddFoodScreen(
 }
 
 @Composable
-fun FoodDatesError(isExpiryDateEarlierThanToday: Boolean) {
+fun FoodDatesError(isExpiryDateEarlierThanToday: Boolean, dateBeforeExpirationWarning: DateBeforeExpirationWarning?) {
     if(isExpiryDateEarlierThanToday) {
-        Text("* El alimento que has introducido ya esta caducado", color = Color(0xFFF1B81A))
+        dateBeforeExpirationWarning?.let { warning ->
+           val text = when(warning) {
+                DateBeforeExpirationWarning.EXPIRATED -> stringResource(id = R.string.food_expired)
+                DateBeforeExpirationWarning.EXPIRATES_TODAY -> stringResource(id = R.string.food_expires_today)
+                DateBeforeExpirationWarning.EXPIRATES_TOMORROW -> stringResource(id = R.string.food_expires_tomorrow)
+            }
+
+            Text(text, color = Color(0xFFF1B81A))
+        }
     }
 }
 
@@ -355,11 +386,11 @@ fun ExpiryDateText(
             .fillMaxWidth()
             .padding(start = 12.dp, end = 30.dp, top = 10.dp, bottom = 10.dp)
             .noRippleClickable { showDatePicker.value = true },
-        text = if (formatDateToString(dateSelected).isNullOrBlank()) stringResource(id = R.string.expiration_date) else formatDateToString(
-            dateSelected
-        )!!,
+        text = if (formatDateToString(dateSelected, LocalContext.current).isNullOrBlank()) stringResource(id = R.string.expiration_date) else formatDateToString(
+            dateSelected, LocalContext.current
+        ),
         fontSize = 18.sp,
-        color = if (formatDateToString(dateSelected).isNullOrBlank()) Color.Gray else Color.Black
+        color = if (formatDateToString(dateSelected, LocalContext.current).isNullOrBlank()) Color.Gray else Color.Black
     )
 }
 
@@ -404,9 +435,9 @@ fun FoodTypeDropdownMenu(
     Spacer(modifier = Modifier.height(5.dp))
     Column {
         Text(
-            text = if (selectedFoodType?.name.isNullOrBlank()) stringResource(id = R.string.food_type) else selectedFoodType?.name ?: "",
+            text = if (selectedFoodType?.foodTypeNameResource.isNullOrBlank()) stringResource(id = R.string.food_type) else getFoodTypeName(selectedFoodType ?: FoodType()),
             fontSize = 18.sp,
-            color = if (selectedFoodType?.name.isNullOrBlank()) Color.Gray else Color.Black,
+            color = if (selectedFoodType?.foodTypeNameResource.isNullOrBlank()) Color.Gray else Color.Black,
             modifier = Modifier
                 .border(
                     width = 1.5.dp,
@@ -428,7 +459,7 @@ fun FoodTypeDropdownMenu(
                     onFoodTypeSelected(it)
                     dropdownExpanded.value = false
                 }) {
-                    Text(text = it.name)
+                    Text(text = it.foodTypeName ?: "")
                 }
             }
         }
@@ -538,7 +569,8 @@ fun AddTimeLeftTextField(
     onValueChanged: (String) -> Unit,
     onDaysBeforeExpirationPlusPressed: () -> Unit,
     onDaysBeforeExpirationMinusPressed: () -> Unit,
-    isDaysBeforeExpirationError: Boolean
+    isDaysBeforeExpirationError: Boolean,
+    isDaysBeforeNotificationEnabled: Boolean
 ) {
     Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
         Box(
@@ -557,6 +589,7 @@ fun AddTimeLeftTextField(
                 BasicTextField(
                     modifier = Modifier.width(IntrinsicSize.Min),
                     value = input,
+                    enabled = isDaysBeforeNotificationEnabled,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     onValueChange = { newText ->
                         onValueChanged(newText)
@@ -582,6 +615,7 @@ fun AddTimeLeftTextField(
 
         Spacer(modifier = Modifier.width(20.dp))
         IconButton(
+            enabled = isDaysBeforeNotificationEnabled,
             onClick = { onDaysBeforeExpirationMinusPressed() }, modifier = Modifier
                 .height(20.dp)
                 .width(20.dp)
@@ -590,6 +624,7 @@ fun AddTimeLeftTextField(
         }
         Spacer(modifier = Modifier.width(20.dp))
         IconButton(
+            enabled = isDaysBeforeNotificationEnabled,
             onClick = { onDaysBeforeExpirationPlusPressed() }, modifier = Modifier
                 .height(20.dp)
                 .width(20.dp)
@@ -602,13 +637,19 @@ fun AddTimeLeftTextField(
 
 @Composable
 fun MySnackBar(
-    message: String, actionLabel: String, duration: SnackbarDuration = SnackbarDuration.Short
+    message: String, actionLabel: String, duration: SnackbarDuration = SnackbarDuration.Short, onDismiss: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(snackbarHostState) {
         snackbarHostState.showSnackbar(message, actionLabel, duration = duration)
     }
+
+    LaunchedEffect(duration) {
+        delay(4500L)
+        onDismiss() // Llamar a la función de notificación cuando el Snackbar desaparezca
+    }
+
     Box(
         Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter
     ) {
@@ -638,7 +679,7 @@ fun PreviewAddFoodScreen() {
         {},
         {},
         Date(),
-        "0",
+        1,
         {},
         {},
         {},
@@ -652,6 +693,13 @@ fun PreviewAddFoodScreen() {
         false,
         FoodType(1, "Legumbres"),
         false,
-        true
+        false,
+        shouldShowInterstitialAd = false,
+        onInterstitialClosed = {},
+        {},
+        false,
+        false,
+        null,
+
     )
 }

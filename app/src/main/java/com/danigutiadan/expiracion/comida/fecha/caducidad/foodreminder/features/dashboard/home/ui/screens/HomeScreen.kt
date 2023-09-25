@@ -42,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.R
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.ads.components.BannerAdView
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.FoodUtils.orderedAlphabetic
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.AddFoodNameTextField
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.noRippleClickable
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.dashboard.home.ui.components.FoodItem
@@ -52,6 +54,7 @@ import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.StringUtils.getFoodOrderFilterName
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.StringUtils.getFoodStatusFilterName
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.StringUtils.getFoodTypeName
 import java.util.Date
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -132,7 +135,7 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(5.dp))
 
             if (foodList.isNotEmpty()) {
-                LazyColumn(modifier = Modifier.background(Color(0xFFECECEC)), content = {
+                LazyColumn(modifier = Modifier.background(Color(0xFFECECEC)).weight(1f), content = {
                     items(foodList.count(), key = { foodList[it].food.id ?: it }) {
                         FoodItem(
                             food = foodList[it],
@@ -151,7 +154,7 @@ fun HomeScreen(
                 })
             } else {
 
-                Box(modifier = Modifier.fillMaxSize()) {
+                Box(modifier = Modifier.fillMaxWidth().weight(1f)) {
                     Text(
                         text = stringResource(id = R.string.no_food_in_list),
                         modifier = Modifier.align(
@@ -161,15 +164,14 @@ fun HomeScreen(
                 }
 
             }
-
-
+            BannerAdView()
         }
 
 
         if (isFiltersDialogVisible.value)
             FiltersDialog(
                 onDismiss = { isFiltersDialogVisible.value = false },
-                foodTypeList = foodTypeList,
+                foodTypeList = foodTypeList.orderedAlphabetic(LocalContext.current),
                 foodStatusSelectedOption = foodStatusSelectedOption,
                 foodTypeSelectedOption = foodTypeSelectedOption,
                 onFoodStatusFilterSelectedOption = onFoodStatusFilterSelectedOption,
@@ -232,7 +234,13 @@ fun ButtonsBar(
                 .background(Color.Transparent)
                 .clip(RoundedCornerShape(0.dp))
         ) {
-            Text(text = foodFiltersTextState, style = TextStyle(color = Color.DarkGray), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, maxLines = 2)
+            Text(
+                text = foodFiltersTextState,
+                style = TextStyle(color = Color.DarkGray),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
         }
 
         Divider(
@@ -249,186 +257,200 @@ fun ButtonsBar(
                 .background(Color.Transparent)
                 .clip(RoundedCornerShape(0.dp))
         ) {
-            Text(text = foodOrderText, style = TextStyle(color = Color.DarkGray), modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center, maxLines = 2)
+            Text(
+                text = foodOrderText,
+                style = TextStyle(color = Color.DarkGray),
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
         }
         FoodOrderDropdown(
             isExpanded = isFoodOrderDropdownVisible,
             onDismissRequest = onFoodOrderDismissRequest,
             foodOrderList,
-            onFoodOrderSelected)
+            onFoodOrderSelected
+        )
     }
 }
 
 
-    @Composable
-    fun FiltersDialog(
-        onDismiss: () -> Unit,
-        foodTypeList: List<FoodType>,
-        foodStatusSelectedOption: FoodStatus?,
-        foodTypeSelectedOption: FoodType?,
-        onFoodStatusFilterSelectedOption: (FoodStatus?) -> Unit,
-        onFoodTypeFilterSelectedOption: (FoodType?) -> Unit,
-        onApplyFilters: () -> Unit
-    ) {
-        val foodStatusList =
-            listOf(FoodStatus.FRESH, FoodStatus.ABOUT_TO_EXPIRE, FoodStatus.ALMOST_EXPIRED)
-        val isFoodStatusDropdownExpanded = remember { mutableStateOf(false) }
-        val isFoodTypeDropdownExpanded = remember { mutableStateOf(false) }
-        AlertDialog(
-            modifier = Modifier.fillMaxWidth(),
-            onDismissRequest = onDismiss,
-            title = { Text(stringResource(id = R.string.filters)) },
-            confirmButton = {
-                Row() {
+@Composable
+fun FiltersDialog(
+    onDismiss: () -> Unit,
+    foodTypeList: List<FoodType>,
+    foodStatusSelectedOption: FoodStatus?,
+    foodTypeSelectedOption: FoodType?,
+    onFoodStatusFilterSelectedOption: (FoodStatus?) -> Unit,
+    onFoodTypeFilterSelectedOption: (FoodType?) -> Unit,
+    onApplyFilters: () -> Unit
+) {
+    val foodStatusList =
+        listOf(FoodStatus.FRESH, FoodStatus.ABOUT_TO_EXPIRE, FoodStatus.ALMOST_EXPIRED)
+    val isFoodStatusDropdownExpanded = remember { mutableStateOf(false) }
+    val isFoodTypeDropdownExpanded = remember { mutableStateOf(false) }
+    AlertDialog(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(10.dp),
+        containerColor = Color.White,
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(id = R.string.filters)) },
+        confirmButton = {
+            Row() {
+                Text(
+                    stringResource(id = R.string.clear_filters),
+                    color = Color.Black,
+                    modifier = Modifier.clickable {
+                        onFoodStatusFilterSelectedOption(null)
+                        onFoodTypeFilterSelectedOption(null)
+                        onApplyFilters()
+                    },
+                    fontSize = 18.sp
+                )
+                Spacer(modifier = Modifier.weight(1f))
+                Text(
+                    stringResource(id = R.string.apply),
+                    color = Color.Black,
+                    modifier = Modifier.clickable {
+                        onApplyFilters()
+                    },
+                    fontSize = 18.sp
+                )
+
+
+            }
+        },
+        text = {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                //FOOD STATUS
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .noRippleClickable {
+                        isFoodStatusDropdownExpanded.value =
+                            !isFoodStatusDropdownExpanded.value
+                    }) {
                     Text(
-                        stringResource(id = R.string.clear_filters),
-                        modifier = Modifier.clickable {
+                        text = "${stringResource(id = R.string.status)}:",
+                        fontSize = 17.sp
+                    )
+
+                    DropdownMenu(
+                        expanded = isFoodStatusDropdownExpanded.value,
+                        onDismissRequest = { isFoodStatusDropdownExpanded.value = false }
+                    ) {
+
+                        DropdownMenuItem(onClick = {
                             onFoodStatusFilterSelectedOption(null)
-                            onFoodTypeFilterSelectedOption(null)
-                            onApplyFilters()
-                        },
-                        fontSize = 18.sp
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text(
-                        stringResource(id = R.string.apply),
-                        modifier = Modifier.clickable {
-                            onApplyFilters()
-                        },
-                        fontSize = 18.sp
-                    )
-
-
-                }
-            },
-            text = {
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    //FOOD STATUS
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .noRippleClickable {
-                            isFoodStatusDropdownExpanded.value =
-                                !isFoodStatusDropdownExpanded.value
+                            isFoodStatusDropdownExpanded.value = false
                         }) {
-                        Text(
-                            text = "${stringResource(id = R.string.status)}:",
-                            fontSize = 17.sp
-                        )
-
-                        DropdownMenu(
-                            expanded = isFoodStatusDropdownExpanded.value,
-                            onDismissRequest = { isFoodStatusDropdownExpanded.value = false }
-                        ) {
-
+                            Text(text = stringResource(id = R.string.all))
+                        }
+                        foodStatusList.forEach {
                             DropdownMenuItem(onClick = {
-                                onFoodStatusFilterSelectedOption(null)
+                                onFoodStatusFilterSelectedOption(it)
                                 isFoodStatusDropdownExpanded.value = false
                             }) {
-                                Text(text = stringResource(id = R.string.all))
+                                Text(text = getFoodStatusFilterName(it, LocalContext.current))
                             }
-                            foodStatusList.forEach {
-                                DropdownMenuItem(onClick = {
-                                    onFoodStatusFilterSelectedOption(it)
-                                    isFoodStatusDropdownExpanded.value = false
-                                }) {
-                                    Text(text = getFoodStatusFilterName(it, LocalContext.current))
-                                }
-                            }
-
                         }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            text = getFoodStatusFilterName(foodStatusSelectedOption, LocalContext.current),
-                            fontSize = 17.sp
-                        )
+
                     }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = getFoodStatusFilterName(
+                            foodStatusSelectedOption,
+                            LocalContext.current
+                        ),
+                        fontSize = 17.sp
+                    )
+                }
 
-                    Spacer(modifier = Modifier.height(15.dp))
+                Spacer(modifier = Modifier.height(15.dp))
 
 
-                    //FOOD TYPE
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .noRippleClickable {
-                            isFoodTypeDropdownExpanded.value =
-                                !isFoodTypeDropdownExpanded.value
+                //FOOD TYPE
+                Row(modifier = Modifier
+                    .fillMaxWidth()
+                    .noRippleClickable {
+                        isFoodTypeDropdownExpanded.value =
+                            !isFoodTypeDropdownExpanded.value
+                    }) {
+                    Text(
+                        text = "${stringResource(id = R.string.food_type)}:",
+                        fontSize = 17.sp
+                    )
+
+                    DropdownMenu(
+                        expanded = isFoodTypeDropdownExpanded.value,
+                        onDismissRequest = { isFoodTypeDropdownExpanded.value = false }
+                    ) {
+
+                        DropdownMenuItem(onClick = {
+                            onFoodTypeFilterSelectedOption(null)
+                            isFoodTypeDropdownExpanded.value = false
                         }) {
-                        Text(
-                            text = "${stringResource(id = R.string.food_type)}:",
-                            fontSize = 17.sp
-                        )
-
-                        DropdownMenu(
-                            expanded = isFoodTypeDropdownExpanded.value,
-                            onDismissRequest = { isFoodTypeDropdownExpanded.value = false }
-                        ) {
-
+                            Text(text = stringResource(id = R.string.all))
+                        }
+                        foodTypeList.forEach {
                             DropdownMenuItem(onClick = {
-                                onFoodTypeFilterSelectedOption(null)
+
+                                onFoodTypeFilterSelectedOption(it)
                                 isFoodTypeDropdownExpanded.value = false
                             }) {
-                                Text(text = stringResource(id = R.string.all))
+                                Text(text = it.foodTypeName ?: "")
                             }
-                            foodTypeList.forEach {
-                                DropdownMenuItem(onClick = {
-
-                                    onFoodTypeFilterSelectedOption(it)
-                                    isFoodTypeDropdownExpanded.value = false
-                                }) {
-                                    Text(text = it.name)
-                                }
-                            }
-
                         }
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            text = foodTypeSelectedOption?.name ?: stringResource(id = R.string.all),
-                            fontSize = 17.sp
-                        )
+
                     }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        text = foodTypeSelectedOption?.foodTypeNameResource ?: stringResource(id = R.string.all),
+                        fontSize = 17.sp
+                    )
                 }
             }
-        )
-
-    }
-
-
-    //@Preview(showBackground = true)
-    @Composable
-    fun PreviewHomeScreen() {
-        HomeScreen(
-            "",
-            {},
-            foodList = listOf(
-                FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-                FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-                FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-                FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-                FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-                FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
-            ),
-            {},
-            {},
-            {},
-            null,
-            null,
-            {},
-            {},
-            {},
-            listOf(),
-            "",
-            listOf(),
-            {},
-            "Ordenar por"
-        )
-    }
-
-    @Preview(showBackground = true)
-    @Composable
-    fun PreviewFiltersDialog() {
-        Box(modifier = Modifier.fillMaxSize()) {
-            FiltersDialog({}, listOf(), null, null, {}, {}, {})
         }
+    )
+
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewHomeScreen() {
+    HomeScreen(
+        "",
+        {},
+        foodList = listOf(
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+            FoodInfo(1, Food(1, "Manzana", 3, Date(), 2, 1), FoodType(1, "Fruta")),
+        ),
+        {},
+        {},
+        {},
+        null,
+        null,
+        {},
+        {},
+        {},
+        listOf(),
+        "",
+        listOf(),
+        {},
+        "Ordenar por"
+    )
+}
+
+//@Preview(showBackground = true)
+@Composable
+fun PreviewFiltersDialog() {
+    Box(modifier = Modifier.fillMaxSize()) {
+        FiltersDialog({}, listOf(), null, null, {}, {}, {})
     }
+}
 
 

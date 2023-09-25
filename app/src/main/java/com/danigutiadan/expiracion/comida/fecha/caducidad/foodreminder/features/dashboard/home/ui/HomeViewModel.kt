@@ -11,12 +11,14 @@ import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.DeleteFoodUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.GetAllFoodUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.GetFoodWithFiltersUseCase
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food.domain.usecase.UpdateFoodStatusUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.usecases.GetAllFoodTypesUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.usecases.InsertFoodTypeUseCase
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.Response
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +30,7 @@ class HomeViewModel @Inject constructor(
     private val getFoodWithFiltersUseCase: GetFoodWithFiltersUseCase,
     private val getAllFoodTypesUseCase: GetAllFoodTypesUseCase,
     val preferences: Preferences,
+    private val updateFoodStatusUseCase: UpdateFoodStatusUseCase
 ) : ViewModel() {
 
 
@@ -58,12 +61,42 @@ class HomeViewModel @Inject constructor(
     private val _foodOrderState = MutableStateFlow<FoodOrder?>(null)
     val foodOrderState: StateFlow<FoodOrder?> = _foodOrderState
 
+    private val _isAllFoodUpdated: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val isAllFoodUpdated: StateFlow<Boolean> = _isAllFoodUpdated
+
 
     fun getAllFood() {
         getAllFoodUseCase.execute()
             .onStart { _foodListState.value = mutableListOf() }
             .onEach { _foodListState.value = it }
             .launchIn(viewModelScope)
+    }
+    
+    fun getAllFoodForUpdate() {
+        getAllFoodUseCase.execute()
+            .onStart { _foodListState.value = mutableListOf() }
+            .onEach { foodList ->
+                if(foodList.isNotEmpty()) {
+                    viewModelScope.launch {
+                        updateFoodListState(foodList)
+                    }
+                 } else {
+                    _isAllFoodUpdated.value = true
+                }
+                }
+
+            .launchIn(viewModelScope)
+    }
+
+     private fun updateFoodListState(foodList: List<FoodInfo>) {
+        updateFoodStatusUseCase.execute(foodList)
+            .onStart {
+                _isAllFoodUpdated.value = false
+            }
+            .onEach { response ->
+                if(response is Response.EmptySuccess) {
+                    _isAllFoodUpdated.value = true
+            } }.launchIn(viewModelScope)
     }
 
     fun getFoodTypeList() {

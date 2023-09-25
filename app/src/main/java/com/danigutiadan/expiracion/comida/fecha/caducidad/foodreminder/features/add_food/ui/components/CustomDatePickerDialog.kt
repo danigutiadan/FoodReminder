@@ -1,5 +1,6 @@
 package com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,10 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
+import androidx.compose.material3.Button
 import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
@@ -24,9 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.R
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.DateUtils.getMyDay
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.DateUtils.getMyMonth
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.utils.DateUtils.getMyYear
 import java.util.Calendar
 import java.util.Date
 
@@ -34,10 +41,11 @@ import java.util.Date
 fun CustomDatePickerDialog(
     label: String,
     onDismissRequest: () -> Unit,
-    onDateSelected: (Date) -> Unit
+    onDateSelected: (Date) -> Unit,
+    dateSelected: Date? = null
 ) {
     Dialog(onDismissRequest = { onDismissRequest() }) {
-        DatePickerUI(label, onDismissRequest, onDateSelected)
+        DatePickerUI(label, onDismissRequest, onDateSelected, dateSelected)
     }
 }
 
@@ -45,7 +53,8 @@ fun CustomDatePickerDialog(
 fun DatePickerUI(
     label: String,
     onDismissRequest: () -> Unit,
-    onDateSelected: (Date) -> Unit
+    onDateSelected: (Date) -> Unit,
+    dateSelected: Date? = null
 ) {
     Card(
         shape = RoundedCornerShape(10.dp),
@@ -75,6 +84,7 @@ fun DatePickerUI(
                 onYearChosen = { chosenYear.value = it.toInt() },
                 onMonthChosen = { chosenMonth.value = it.toInt() },
                 onDayChosen = { chosenDay.value = it.toInt() },
+                dateSelected = dateSelected
             )
 
             Spacer(modifier = Modifier.height(30.dp))
@@ -82,6 +92,7 @@ fun DatePickerUI(
             val context = LocalContext.current
             Button(
                 shape = RoundedCornerShape(5.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF8BC34A)),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 10.dp),
@@ -91,9 +102,12 @@ fun DatePickerUI(
                 }
             ) {
                 Text(
-                    text = "Done",
+                    text = stringResource(id = R.string.accept),
+                    color = Color.White,
                     style = MaterialTheme.typography.button,
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(Color(0xFF8BC34A)),
                     textAlign = TextAlign.Center
                 )
             }
@@ -106,6 +120,7 @@ fun DateSelectionSection(
     onYearChosen: (String) -> Unit,
     onMonthChosen: (String) -> Unit,
     onDayChosen: (String) -> Unit,
+    dateSelected: Date? = null
 ) {
     Row(
         horizontalArrangement = Arrangement.SpaceAround,
@@ -115,19 +130,19 @@ fun DateSelectionSection(
     ) {
         InfiniteItemsPicker(
             items = days,
-            firstIndex = Int.MAX_VALUE / 2 + (currentDay - 2),
+            firstIndex = Int.MAX_VALUE / 2 + ((dateSelected?.getMyDay()?.minus(2)) ?: (currentDay - 2)),
             onItemSelected =  onDayChosen
         )
 
         InfiniteItemsPicker(
             items = months,
-            firstIndex = Int.MAX_VALUE / 2 - 4 + currentMonth,
+            firstIndex = Int.MAX_VALUE / 2 - 4 + (dateSelected?.getMyMonth() ?: currentMonth),
             onItemSelected =  onMonthChosen
         )
 
         InfiniteItemsPicker(
             items = years,
-            firstIndex = Int.MAX_VALUE / 2 + (currentYear - 1969),
+            firstIndex = Int.MAX_VALUE / 2 + ((dateSelected?.getMyYear() ?: currentYear) - 1969),
             onItemSelected = onYearChosen
         )
     }

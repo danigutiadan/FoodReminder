@@ -36,8 +36,6 @@ class HomeFragment : BaseFragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
-
         // Inflate the layout for this fragment
         setCollectors()
         return ComposeView(requireContext()).apply {

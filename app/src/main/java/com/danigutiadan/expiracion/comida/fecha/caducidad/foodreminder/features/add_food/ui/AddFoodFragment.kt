@@ -15,6 +15,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.BaseFragment
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.R
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.ads.randomNumber
+import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.ads.showInterstitial
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.add_food.ui.screens.AddFoodScreen
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.features.food_type.domain.models.FoodType
 import com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder.notifications.FoodNotification
@@ -36,6 +38,8 @@ class AddFoodFragment : BaseFragment() {
     lateinit var alarmManager: AlarmManager
 
 
+
+
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -51,7 +55,7 @@ class AddFoodFragment : BaseFragment() {
                 val foodName: String by viewModel.foodName.collectAsState()
                 val foodQuantity: String by viewModel.foodQuantity.collectAsState()
                 val expiryDate: Date? by viewModel.expiryDate.collectAsState()
-                val daysBeforeExpiration: String by viewModel.daysBeforeExpiration.collectAsState()
+                val daysBeforeExpiration: Int by viewModel.daysBeforeExpiration.collectAsState()
                 val remoteImageUrl: String by viewModel.foodImageUrl.collectAsState()
                 val isNameError: Boolean by viewModel.isNameError.collectAsState()
                 val isQuantityError: Boolean by viewModel.isQuantityError.collectAsState()
@@ -61,8 +65,17 @@ class AddFoodFragment : BaseFragment() {
                 val isExpiryDateEarlierThanToday: Boolean by viewModel.isExpiryDateEarlierThanToday.collectAsState()
                 val selectedFoodType: FoodType? by viewModel.foodType.collectAsState()
                 val isFoodAddedSuccessfully: Boolean by viewModel.isFoodAddedSuccessfully.collectAsState()
+                val shouldShowInterstitialAd: Boolean by viewModel.shouldShowInterstitialAd.collectAsState()
+                val shouldShowSuccessfullySnackBar: Boolean by viewModel.shouldShowSuccessfullySnackBar.collectAsState()
+                val isDaysBeforeNotificationEnabled: Boolean by viewModel.isDaysBeforeNotificationEnabled.collectAsState()
+                val dateBeforeExpirationWarning: DateBeforeExpirationWarning? by viewModel.dateBeforeExpirationWarning.collectAsState()
                 AddFoodScreen(
-                    backClickListener = { activity?.onBackPressed() },
+                    backClickListener = {
+                        if(1 == randomNumber()) {
+                            showInterstitial(context, onAdDismissed = { activity?.onBackPressed() })
+                        } else {
+                            activity?.onBackPressed()
+                        }},
                     barcodeClickListener = {
                         initiateScan()
                     },
@@ -124,7 +137,13 @@ class AddFoodFragment : BaseFragment() {
                     isDaysBeforeExpirationError = isDaysBeforeExpirationError,
                     selectedFoodType = selectedFoodType,
                     isFoodAddedSuccessfully = isFoodAddedSuccessfully,
-                    isExpiryDateEarlierThanToday = isExpiryDateEarlierThanToday
+                    isExpiryDateEarlierThanToday = isExpiryDateEarlierThanToday,
+                    shouldShowInterstitialAd = shouldShowInterstitialAd,
+                    onInterstitialClosed = { viewModel.onInterstitialClosed() },
+                    onSnackBarDisappeared = { viewModel.hideFoodAddedSuccessfullySnackBar()},
+                    shouldShowSuccessfullySnackBar = shouldShowSuccessfullySnackBar,
+                    isDaysBeforeNotificationEnabled = isDaysBeforeNotificationEnabled,
+                    dateBeforeExpirationWarning = dateBeforeExpirationWarning
                 )
             }
         }
@@ -136,7 +155,7 @@ class AddFoodFragment : BaseFragment() {
         lifecycleScope.launch {
             viewModel.isFoodAddedSuccessfully.collect {isAddedSuccessfully ->
                 if (isAddedSuccessfully) {
-                    if(viewModel.isExpiryDateLaterThanTodayInFragment()) {
+                    if(viewModel.shouldShowNotification()) {
                         val intent = Intent(context, FoodNotification::class.java)
                         val pendingIntent = PendingIntent.getBroadcast(context, viewModel.foodAddedId.value, intent, PendingIntent.FLAG_IMMUTABLE)
 

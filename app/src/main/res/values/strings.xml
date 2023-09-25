@@ -1,84 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name" translatable="false">FoodReminder</string>
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment" translatable="false">Hello blank fragment</string>
+    <string name="app_name" translatable="false">Food Reminder</string>
+    <!-- TODO: Remove or change this placeholder text -->
     <string name="user_info" translatable="false">user_info</string>
     <string name="is_database_initialized" translatable="false">is_database_initialized</string>,
-    <string name="add_food_prompt">Añade tu alimento</string>
-    <string name="product_name_prompt">¿Cuál es el nombre de tu producto?</string>
-    <string name="quantity_prompt">¿Cuántas unidades, paquetes, bricks… tienes?</string>
-    <string name="expiration_date_prompt">Introduce la fecha de caducidad de tu producto</string>
-    <string name="expiration_date">Fecha de caducidad</string>
-    <string name="notification_days_prompt">¿Cuántos días antes de la fecha de caducidad deseas recibir una notificación?</string>
-    <string name="product_added">Producto añadido correctamente</string>
-    <string name="take_photo">Tomar foto</string>
-    <string name="choose_existing_photo">Elegir foto existente</string>
-    <string name="food_type_prompt">¿Qué tipo de alimento es?</string>
-    <string name="food_type">Tipo de alimento</string>
-    <string name="unit">unidad</string>
-    <string name="units">unidades</string>
-    <string name="day_before">día antes</string>
-    <string name="days_before">días antes</string>
+    <string name="add_food_prompt">Add your food</string>
+    <string name="product_name_prompt">What is the name of your product?</string>
+    <string name="quantity_prompt">How many units, packages, bricks… do you have?</string>
+    <string name="expiration_date_prompt">Enter the expiration date of your product</string>
+    <string name="expiration_date">Expiration Date</string>
+    <string name="notification_days_prompt">How many days before the expiration date do you want to receive a notification?</string>
+    <string name="product_added">Product added successfully</string>
+    <string name="take_photo">Take photo</string>
+    <string name="choose_existing_photo">Choose existing photo</string>
+    <string name="food_type_prompt">What type of food is it?</string>
+    <string name="food_type">Food Type</string>
+    <string name="unit">unit</string>
+    <string name="units">units</string>
+    <string name="day_before">day before</string>
+    <string name="days_before">days before</string>
+    <string name="search_food">Search for your foods</string>
+    <string name="no_food_in_list">You don\'t have any food in your list yet</string>
+    <string name="most_recent">Most recent</string>
+    <string name="filters">Filters</string>
+    <string name="clear_filters">Clear filters</string>
+    <string name="apply">Apply</string>
+    <string name="status">Status</string>
+    <string name="accept">Accept</string>
+    <string name="all">All</string>
+    <string name="edit_food">Edit your food</string>
+    <string name="quantity">Quantity</string>
+    <string name="product_name">Product Name</string>
+    <string name="category_fruits">Fruits</string>
+    <string name="category_vegetables">Vegetables</string>
+    <string name="category_meat">Meat</string>
+    <string name="category_fish_seafood">Fish and Seafood</string>
+    <string name="category_dairy">Dairy</string>
+    <string name="category_bread_cereals">Bread and Cereals</string>
+    <string name="category_legumes">Legumes</string>
+    <string name="category_sweets_desserts">Sweets and Desserts</string>
+    <string name="category_beverages">Beverages</string>
+    <string name="category_frozen_foods">Frozen Foods</string>
+    <string name="category_canned_goods">Canned Goods</string>
+    <string name="category_snacks_appetizers">Snacks and Appetizers</string>
+    <string name="category_sauces">Sauces</string>
+    <string name="category_ice_creams">Ice Creams</string>
+    <string name="category_juices_soft_drinks">Juices and Soft Drinks</string>
+    <string name="category_pasta_sauces">Pasta and Sauces</string>
+    <string name="category_eggs">Eggs</string>
+    <string name="category_nuts">Nuts</string>
+    <string name="category_ready_meals">Ready Meals</string>
+    <string name="category_breakfast_cereals">Breakfast Cereals</string>
+    <string name="category_bakery_products">Bakery Products</string>
+    <string name="category_fast_food">Fast Food</string>
+    <string name="category_breakfast_items">Breakfast Items</string>
+    <string name="category_condiments_spices">Condiments and Spices</string>
+    <string name="category_cheeses">Cheeses</string>
+    <string name="category_soups_broths">Soups and Broths</string>
+    <string name="category_oils_vinegars">Oils and Vinegars</string>
+    <string name="category_ready_dishes">Ready Dishes</string>
+    <string name="category_gluten_free">Gluten-Free Foods</string>
+    <string name="category_organic_foods">Organic Foods</string>
+    <string name="category_baby_foods">Baby Foods</string>
 
-    <string name="search_food">Busca tus alimentos</string>
-    <string name="no_food_in_list">No tienes ningún alimento en tu lista aún</string>
-    <string name="most_recent">Más recientes</string>
-    <string name="filters">Filtros</string>
-    <string name="clear_filters">Borrar filtros</string>
-    <string name="apply">Aplicar</string>
-    <string name="status">Estado</string>
-    <string name="all">Todos</string>
-    <string name="edit_food">Edita tu alimento</string>
-    <string name="quantity">Cantidad</string>
-    <string name="product_name">Nombre del producto</string>
+    <string name="fresh">Fresh</string>
+    <string name="near_expiry">Near Expiry</string>
+    <string name="almost_expired">Almost Expired</string>
+    <string name="food_state_asc">Food State: Ascending</string>
+    <string name="food_state_desc">Food State: Descending</string>
+    <string name="sort_by">Sort By</string>
+    <string name="filter">Filter</string>
 
-    <string name="category_fruits">Frutas</string>
-    <string name="category_vegetables">Verduras</string>
-    <string name="category_meat">Carnes</string>
-    <string name="category_fish_seafood">Pescados y Mariscos</string>
-    <string name="category_dairy">Lácteos</string>
-    <string name="category_bread_cereals">Pan y Cereales</string>
-    <string name="category_legumes">Legumbres</string>
-    <string name="category_sweets_desserts">Dulces y Postres</string>
-    <string name="category_beverages">Bebidas</string>
-    <string name="category_frozen_foods">Alimentos Congelados</string>
-    <string name="category_canned_goods">Conservas</string>
-    <string name="category_snacks_appetizers">Snacks y Aperitivos</string>
-    <string name="category_sauces">Salsas</string>
-    <string name="category_ice_creams">Helados</string>
-    <string name="category_juices_soft_drinks">Zumos y Bebidas Refrescantes</string>
-    <string name="category_pasta_sauces">Pastas y Salsas</string>
-    <string name="category_eggs">Huevos</string>
-    <string name="category_nuts">Frutos Secos</string>
-    <string name="category_ready_meals">Comida Preparada</string>
-    <string name="category_breakfast_cereals">Cereales para el Desayuno</string>
-    <string name="category_bakery_products">Productos de Panadería</string>
-    <string name="category_fast_food">Comida Rápida</string>
-    <string name="category_breakfast_items">Productos para Desayuno</string>
-    <string name="category_condiments_spices">Condimentos y Especias</string>
-    <string name="category_cheeses">Quesos</string>
-    <string name="category_soups_broths">Sopas y Caldos</string>
-    <string name="category_oils_vinegars">Aceites y Vinagres</string>
-    <string name="category_ready_dishes">Platos Preparados</string>
-    <string name="category_gluten_free">Alimentos sin Gluten</string>
-    <string name="category_organic_foods">Alimentos Orgánicos</string>
-    <string name="category_baby_foods">Alimentos para Bebés</string>
+    <string name="food_expiration_notification_title">Food expiration</string>
 
-    <string name="fresh">Fresco</string>
-    <string name="near_expiry">Cerca de caducar</string>
-    <string name="almost_expired">Casi caducado</string>
-    <string name="food_state_asc">Estado del alimento: Menor a mayor</string>
-    <string name="food_state_desc">Estado del alimento: Mayor a menor</string>
-    <string name="sort_by">Ordenar por</string>
-    <string name="filter">Filtrar</string>
+    <string name="scan_barcode">Scan a barcode</string>
 
-    <string name="food_expiration_notification_title">Caducidad de alimentos</string>
+    <string name="update_needed">Update Required</string>
+    <string name="update_required_message">An app update is required to continue.</string>
 
-    <string name="scan_barcode">Escanea un código de barras</string>
-
-
-
-
+    <string name="food_expired">The food has already expired</string>
+    <string name="food_expires_today">The food expires today</string>
+    <string name="food_expires_tomorrow">The food will expire tomorrow</string>
 
 
 

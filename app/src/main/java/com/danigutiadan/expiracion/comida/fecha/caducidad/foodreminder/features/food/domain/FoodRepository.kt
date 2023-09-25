@@ -40,4 +40,6 @@ interface FoodRepository {
     ): Flow<List<FoodInfo>>
     fun getFoodById(id: Int): Flow<FoodInfo>
     fun deleteFood(food: Food): Flow<Response<Unit>>
+
+    fun updateAllFoodStatus(foodList: List<FoodInfo>): Flow<Response<Unit>>
 }

@@ -23,6 +23,9 @@ interface FoodDao {
     @Update
     fun updateFood(food: Food)
 
+    @Update
+    fun updateFoodList(foodList: List<Food>)
+
     @Query("SELECT * FROM food")
     fun getAllFood(): Flow<List<Food>>
 
