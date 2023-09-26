@@ -71,11 +71,7 @@ class AddFoodFragment : BaseFragment() {
                 val dateBeforeExpirationWarning: DateBeforeExpirationWarning? by viewModel.dateBeforeExpirationWarning.collectAsState()
                 AddFoodScreen(
                     backClickListener = {
-                        if(1 == randomNumber()) {
-                            showInterstitial(context, onAdDismissed = { activity?.onBackPressed() })
-                        } else {
-                            activity?.onBackPressed()
-                        }},
+                        activity?.onBackPressed()},
                     barcodeClickListener = {
                         initiateScan()
                     },
