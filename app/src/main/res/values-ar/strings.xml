@@ -72,5 +72,8 @@
     <string name="food_expired">انتهت صلاحية الطعام بالفعل</string>
     <string name="food_expires_today">انتهاء صلاحية الطعام اليوم</string>
     <string name="food_expires_tomorrow">الطعام سينتهي صلاحيته غدًا</string>
+    <string name="food_expiration_notification">لديك طعام قريب من انتهاء الصلاحية!</string>
+    <string name="food_expiration_notification_details">وقت التحقق من طعامك. استشر FoodReminder الآن لتجنب الفاقد!</string>
+
 
 </resources>

@@ -71,4 +71,7 @@
     <string name="food_expired">El alimento ya ha caducado</string>
     <string name="food_expires_today">El alimento caduca hoy</string>
     <string name="food_expires_tomorrow">El alimento va a caducar mañana</string>
+    <string name="food_expiration_notification">¡Tienes alimentos cerca de caducarse!</string>
+    <string name="food_expiration_notification_details">Hora de revisar tus alimentos. ¡Consulta en FoodReminder ahora para evitar desperdicios!</string>
+
 </resources>

@@ -38,15 +38,15 @@ class FoodNotification : BroadcastReceiver() {
 
         val contentIntent = PendingIntent.getActivity(
             context, 0,
-            Intent(context, MainActivity::class.java), PendingIntent.FLAG_UPDATE_CURRENT
+            Intent(context, MainActivity::class.java), PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         )
 
 
         // Crear el contenido de la notificación
         val builder = NotificationCompat.Builder(context, "1")
             .setSmallIcon(R.drawable.ic_alarm) // Icono pequeño de la notificación
-            .setContentTitle("¡Tienes alimentos cerca de caducarse!")
-            .setStyle(NotificationCompat.BigTextStyle().bigText("Hora de revisar tus alimentos. ¡Consulta en FoodReminder ahora para evitar desperdicios!"))
+            .setContentTitle(context.getString(R.string.food_expiration_notification))
+            .setStyle(NotificationCompat.BigTextStyle().bigText(context.getString(R.string.food_expiration_notification_details)))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(contentIntent)
             .setAutoCancel(true)

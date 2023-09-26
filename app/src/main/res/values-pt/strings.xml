@@ -72,4 +72,7 @@
     <string name="food_expired">O alimento já venceu</string>
     <string name="food_expires_today">O alimento vence hoje</string>
     <string name="food_expires_tomorrow">O alimento vai vencer amanhã</string>
+    <string name="food_expiration_notification">Você tem alimentos perto do vencimento!</string>
+    <string name="food_expiration_notification_details">Hora de verificar sua comida. Consulte o FoodReminder agora para evitar o desperdício!</string>
+
 </resources>

@@ -386,11 +386,11 @@ fun ExpiryDateText(
             .fillMaxWidth()
             .padding(start = 12.dp, end = 30.dp, top = 10.dp, bottom = 10.dp)
             .noRippleClickable { showDatePicker.value = true },
-        text = if (formatDateToString(dateSelected, LocalContext.current).isNullOrBlank()) stringResource(id = R.string.expiration_date) else formatDateToString(
-            dateSelected, LocalContext.current
+        text = if (formatDateToString(dateSelected).isNullOrBlank()) stringResource(id = R.string.expiration_date) else formatDateToString(
+            dateSelected
         ),
         fontSize = 18.sp,
-        color = if (formatDateToString(dateSelected, LocalContext.current).isNullOrBlank()) Color.Gray else Color.Black
+        color = if (formatDateToString(dateSelected).isNullOrBlank()) Color.Gray else Color.Black
     )
 }
 

@@ -72,4 +72,7 @@
     <string name="food_expired">Das Lebensmittel ist bereits abgelaufen</string>
     <string name="food_expires_today">Das Lebensmittel läuft heute ab</string>
     <string name="food_expires_tomorrow">Das Lebensmittel läuft morgen ab</string>
+    <string name="food_expiration_notification">Sie haben Lebensmittel kurz vor dem Ablaufdatum!</string>
+    <string name="food_expiration_notification_details">Zeit, Ihr Essen zu überprüfen. Konsultieren Sie jetzt FoodReminder, um Verschwendung zu vermeiden!</string>
+
 </resources>

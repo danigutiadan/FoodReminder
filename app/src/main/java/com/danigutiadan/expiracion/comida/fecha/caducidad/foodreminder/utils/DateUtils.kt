@@ -11,26 +11,12 @@ import java.util.Locale
 
 object DateUtils {
 
-    fun formatDateToString(date: Date?, context: Context): String {
-        if (date == null) {
-            return ""
-        }
-
-        val dateFormat = DateFormat.getDateInstance(DateFormat.SHORT, getCurrentLocale(context))
-
-        // Verificar si el formato es SimpleDateFormat
-        if (dateFormat is SimpleDateFormat) {
-            val pattern = dateFormat.toPattern()
-
-            // Reemplazar 'd' por 'dd' y 'M' por 'MM' en el patrón del formato
-            val updatedPattern = pattern.replace("d", "dd").replace("M", "MM")
-            val updatedDateFormat = SimpleDateFormat(updatedPattern, Locale.getDefault())
-
-            return updatedDateFormat.format(date)
-        }
-
-        // Si no es SimpleDateFormat, usar el formato original
-        return dateFormat.format(date)
+    fun formatDateToString(date: Date?): String {
+        return if (date != null) {
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            dateFormat.format(date)
+        } else
+            ""
     }
 
 

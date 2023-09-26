@@ -72,4 +72,7 @@
     <string name="food_expired">खाद्य पदार्थ पहले ही समय सीमा समाप्त हो गया है</string>
     <string name="food_expires_today">खाद्य पदार्थ आज समय सीमा समाप्त होता है</string>
     <string name="food_expires_tomorrow">खाद्य पदार्थ कल समय सीमा समाप्त होगा</string>
+    <string name="food_expiration_notification">आपके पास समय सीमा के पास खाद्य है!</string>
+    <string name="food_expiration_notification_details">आपके भोजन की जांच करने का समय है। बर्बादी से बचने के लिए अब ही FoodReminder में सलाह लें!</string>
+
 </resources>

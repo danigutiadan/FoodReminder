@@ -93,7 +93,7 @@ fun FoodItem(
                         color = Color.White
                     )
                     Text(
-                        text = "${stringResource(id = R.string.expiration_date)}: ${formatDateToString(food.food.expiryDate, LocalContext.current)}",
+                        text = "${stringResource(id = R.string.expiration_date)}: ${formatDateToString(food.food.expiryDate)}",
                         fontSize = 16.sp,
                         color = Color.White,
                         modifier = Modifier.padding(bottom = 5.dp)

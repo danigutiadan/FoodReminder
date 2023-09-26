@@ -82,6 +82,9 @@
     <string name="food_expired">The food has already expired</string>
     <string name="food_expires_today">The food expires today</string>
     <string name="food_expires_tomorrow">The food will expire tomorrow</string>
+    <string name="food_expiration_notification">You have food close to expiration!</string>
+    <string name="food_expiration_notification_details">Time to check your food. Consult FoodReminder now to avoid wastage!</string>
+
 
 
 
