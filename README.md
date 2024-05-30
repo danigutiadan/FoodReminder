@@ -24,4 +24,9 @@ Welcome to FoodReminder, the essential app for smartly managing and controlling 
 
 With FoodReminder, you'll not only prevent food waste 🍕🍔🍟 but also save money by maximizing your home supplies. Whether you're at home, shopping, or on the go 🏃‍♂️, this app will help you make smarter decisions about your groceries.
 
-Download FoodReminder today and join the community of individuals dedicated to reducing food waste and living more sustainably. Take control of your expiry dates like never before and enjoy fresh and delicious food at all times! 🍎🌟
+![](https://play-lh.googleusercontent.com/avtsnVWYsVwNCYVWDbFMZ0WgSkhlz4lo5lJsktW7NdI76TAuAnvVi1wRmXtuuu2QQGg=w526-h296-rw)
+![](https://play-lh.googleusercontent.com/H7nu8a6fB7d_JNAZgzS7UDMWbjrA2-vNM5UIycAJQB4_r6vACbW0O2Vqt4AzeWYuASSD=w526-h296-rw)
+![](https://play-lh.googleusercontent.com/l7ajaBNEOROLXC7hLNVEdy6QwQNm-o7v0C_J372atWnCuZCRVPuHW2BlJNgxEM3RmO0=w526-h296-rw)
+![](https://play-lh.googleusercontent.com/QClql8YbKrwZRz50LnGxXrDuecCAP_xUxFL_95jTNlV6VtMfqR4e_LA5i1q5Fv1A4gw=w526-h296-rw)
+
+[Download FoodReminder here!](https://play.google.com/store/apps/details?id=com.danigutiadan.expiracion.comida.fecha.caducidad.foodreminder)
